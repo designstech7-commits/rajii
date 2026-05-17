@@ -1,0 +1,2286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Rajesh S — Premium 3D Modeling & Visual Artist. Specializing in Hard Surface, Character, Product Visualization, VFX & Cinematic Renders.">
+<title>RAJESH.S — 3D Modeling & Visual Artist</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;800;900&family=Rajdhani:wght@400;500;600;700&family=Space+Grotesk:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<style>
+/* ═══════════════════════════════════════════════════
+   ROOT VARIABLES
+═══════════════════════════════════════════════════ */
+:root {
+  --bg:      #020408;
+  --bg2:     #060c14;
+  --bg3:     #0a1020;
+  --bg4:     #040810;
+  --cyan:    #00f5ff;
+  --cyan2:   #00c8d4;
+  --blue:    #0047ff;
+  --purple:  #8b00ff;
+  --pink:    #ff2d78;
+  --green:   #00ff88;
+  --gold:    #ffd700;
+  --white:   #e8f4f8;
+  --muted:   rgba(232,244,248,.52);
+  --surf:    rgba(0,245,255,.04);
+  --surf2:   rgba(0,245,255,.07);
+  --border:  rgba(0,245,255,.1);
+  --border2: rgba(0,245,255,.22);
+  --fd: 'Orbitron', monospace;
+  --fr: 'Rajdhani', sans-serif;
+  --fb: 'Space Grotesk', sans-serif;
+  --grad:  linear-gradient(135deg, #00f5ff 0%, #8b00ff 100%);
+  --grad2: linear-gradient(135deg, #ff2d78 0%, #8b00ff 100%);
+  --grad3: linear-gradient(135deg, #00f5ff 0%, #0047ff 100%);
+  --grad4: linear-gradient(135deg, #00ff88 0%, #00f5ff 100%);
+  --glow:  0 0 20px rgba(0,245,255,.45), 0 0 60px rgba(0,245,255,.2), 0 0 100px rgba(0,245,255,.08);
+  --glow2: 0 0 20px rgba(139,0,255,.45), 0 0 60px rgba(139,0,255,.2);
+  --glow3: 0 0 20px rgba(255,45,120,.45), 0 0 60px rgba(255,45,120,.2);
+}
+
+/* ═══════════════════════════════════════════════════
+   RESET & BASE
+═══════════════════════════════════════════════════ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; font-size: 16px; }
+body {
+  background: var(--bg);
+  color: var(--white);
+  font-family: var(--fb);
+  font-weight: 300;
+  line-height: 1.75;
+  overflow-x: hidden;
+  cursor: none;
+}
+a { text-decoration: none; cursor: none; }
+img { display: block; max-width: 100%; }
+button { cursor: none; }
+::selection { background: rgba(0,245,255,.2); color: var(--cyan); }
+
+/* ═══════════════════════════════════════════════════
+   SCROLLBAR
+═══════════════════════════════════════════════════ */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--grad); border-radius: 99px; }
+
+/* ═══════════════════════════════════════════════════
+   CUSTOM CURSOR
+═══════════════════════════════════════════════════ */
+#cur-dot {
+  position: fixed; width: 10px; height: 10px;
+  background: var(--cyan); border-radius: 50%;
+  pointer-events: none; z-index: 999999;
+  transform: translate(-50%,-50%);
+  box-shadow: var(--glow);
+  transition: width .12s, height .12s, background .12s;
+  mix-blend-mode: screen;
+}
+#cur-ring {
+  position: fixed; width: 40px; height: 40px;
+  border: 1.5px solid rgba(0,245,255,.4);
+  border-radius: 50%; pointer-events: none; z-index: 999998;
+  transform: translate(-50%,-50%);
+}
+#cur-cross {
+  position: fixed; width: 20px; height: 20px;
+  pointer-events: none; z-index: 999997;
+  transform: translate(-50%,-50%);
+  opacity: 0; transition: opacity .2s;
+}
+#cur-cross::before, #cur-cross::after {
+  content: ''; position: absolute;
+  background: var(--cyan); top: 50%; left: 50%;
+}
+#cur-cross::before { width: 20px; height: 1px; transform: translate(-50%,-50%); }
+#cur-cross::after { width: 1px; height: 20px; transform: translate(-50%,-50%); }
+body:has(a:hover) #cur-dot,
+body:has(button:hover) #cur-dot { width: 20px; height: 20px; background: var(--pink); }
+body:has(a:hover) #cur-ring,
+body:has(button:hover) #cur-ring { width: 56px; height: 56px; border-color: rgba(255,45,120,.4); }
+
+/* ═══════════════════════════════════════════════════
+   MOUSE GLOW
+═══════════════════════════════════════════════════ */
+#mouse-glow {
+  position: fixed; width: 500px; height: 500px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(0,245,255,.07) 0%, transparent 65%);
+  pointer-events: none; z-index: 1;
+  transform: translate(-50%,-50%);
+  transition: left .2s ease, top .2s ease;
+}
+
+/* ═══════════════════════════════════════════════════
+   PARTICLE CANVAS (BG)
+═══════════════════════════════════════════════════ */
+#bg-canvas {
+  position: fixed; inset: 0;
+  pointer-events: none; z-index: 0;
+  opacity: .45;
+}
+
+/* ═══════════════════════════════════════════════════
+   CINEMATIC LOADER
+═══════════════════════════════════════════════════ */
+#loader {
+  position: fixed; inset: 0; z-index: 1000000;
+  background: var(--bg);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 28px;
+  transition: opacity .9s cubic-bezier(.4,0,.2,1), visibility .9s;
+}
+#loader.out { opacity: 0; visibility: hidden; pointer-events: none; }
+.ld-logo-wrap {
+  position: relative;
+  width: 130px; height: 130px;
+  display: flex; align-items: center; justify-content: center;
+}
+.ld-ring1 {
+  position: absolute; inset: 0; border-radius: 50%;
+  border: 2px solid transparent;
+  border-top: 2px solid var(--cyan);
+  border-right: 2px solid var(--purple);
+  animation: spin1 1s linear infinite;
+  box-shadow: 0 0 30px rgba(0,245,255,.3);
+}
+.ld-ring2 {
+  position: absolute; inset: 14px; border-radius: 50%;
+  border: 1.5px solid transparent;
+  border-bottom: 1.5px solid var(--pink);
+  border-left: 1.5px solid var(--blue);
+  animation: spin1 1.4s linear infinite reverse;
+}
+.ld-ring3 {
+  position: absolute; inset: 28px; border-radius: 50%;
+  border: 1px solid transparent;
+  border-top: 1px solid var(--green);
+  animation: spin1 .7s linear infinite;
+  opacity: .5;
+}
+.ld-text-logo {
+  font-family: var(--fd); font-size: 1.1rem; font-weight: 900;
+  background: var(--grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  letter-spacing: .05em; position: relative; z-index: 1;
+}
+.ld-progress-wrap {
+  width: 260px;
+  display: flex; flex-direction: column; gap: 10px; align-items: center;
+}
+.ld-bar-bg {
+  width: 100%; height: 2px;
+  background: rgba(0,245,255,.08); border-radius: 99px; overflow: hidden;
+  position: relative;
+}
+.ld-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--cyan), var(--blue), var(--purple), var(--pink));
+  background-size: 200% 100%;
+  animation: lbar 2.6s cubic-bezier(.4,0,.2,1) forwards, gradShift 1.5s linear infinite;
+  border-radius: 99px;
+  box-shadow: 0 0 10px var(--cyan);
+}
+@keyframes lbar { from { width: 0; } to { width: 100%; } }
+@keyframes gradShift { from { background-position: 0% 50%; } to { background-position: 200% 50%; } }
+.ld-label {
+  font-family: var(--fr); font-size: .7rem;
+  color: var(--cyan); letter-spacing: .3em; text-transform: uppercase;
+  animation: blink1 1.4s ease-in-out infinite;
+}
+.ld-scanline {
+  position: absolute; top: 0; left: 0; right: 0;
+  height: 3px; background: rgba(0,245,255,.15);
+  animation: scanDown 2.6s linear;
+}
+@keyframes scanDown { from { top: 0; } to { top: 100%; } }
+@keyframes spin1 { to { transform: rotate(360deg); } }
+@keyframes blink1 { 0%,100% { opacity: 1; } 50% { opacity: .15; } }
+
+/* ═══════════════════════════════════════════════════
+   NAVIGATION
+═══════════════════════════════════════════════════ */
+#nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 5000;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 22px 5%;
+  backdrop-filter: blur(28px) saturate(1.6);
+  background: rgba(2,4,8,.75);
+  border-bottom: 1px solid var(--border);
+  transition: padding .3s;
+}
+#nav.scrolled { padding: 13px 5%; border-bottom-color: var(--border2); }
+.nav-logo {
+  font-family: var(--fd); font-size: .95rem; font-weight: 900;
+  background: var(--grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  letter-spacing: .12em; position: relative;
+}
+.nav-logo::after {
+  content: '';
+  position: absolute; bottom: -4px; left: 0; right: 0; height: 1px;
+  background: var(--grad); transform: scaleX(.4); transform-origin: left;
+  transition: transform .3s;
+}
+.nav-logo:hover::after { transform: scaleX(1); }
+.nav-ul {
+  display: flex; gap: 30px; list-style: none;
+}
+.nav-ul a {
+  font-family: var(--fr); font-size: .78rem; color: var(--muted);
+  letter-spacing: .14em; text-transform: uppercase;
+  transition: color .25s; position: relative;
+}
+.nav-ul a::after {
+  content: ''; position: absolute; left: 0; bottom: -3px;
+  width: 0; height: 1px; background: var(--cyan);
+  transition: width .3s; box-shadow: 0 0 8px var(--cyan);
+}
+.nav-ul a:hover { color: var(--cyan); }
+.nav-ul a:hover::after { width: 100%; }
+.nav-hire {
+  padding: 9px 24px;
+  border: 1px solid var(--cyan); border-radius: 3px;
+  color: var(--cyan); font-family: var(--fr); font-size: .76rem;
+  font-weight: 700; text-transform: uppercase; letter-spacing: .1em;
+  transition: all .3s; box-shadow: 0 0 14px rgba(0,245,255,.12);
+  position: relative; overflow: hidden;
+}
+.nav-hire::before {
+  content: ''; position: absolute; inset: 0;
+  background: var(--cyan); transform: translateX(-100%); transition: transform .3s; z-index: -1;
+}
+.nav-hire:hover { color: var(--bg); box-shadow: var(--glow); }
+.nav-hire:hover::before { transform: translateX(0); }
+.ham-btn {
+  display: none; flex-direction: column; gap: 5px;
+  background: none; border: none; padding: 4px;
+}
+.ham-btn span {
+  display: block; width: 26px; height: 1.5px;
+  background: var(--cyan); border-radius: 99px; transition: all .3s;
+}
+.mob-nav {
+  position: fixed; inset: 0; z-index: 4999;
+  background: rgba(2,4,8,.97); backdrop-filter: blur(40px);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 36px; opacity: 0; pointer-events: none; transition: opacity .4s;
+}
+.mob-nav.open { opacity: 1; pointer-events: all; }
+.mob-nav a {
+  font-family: var(--fd); font-size: 1.5rem; font-weight: 700;
+  color: var(--white); letter-spacing: .1em;
+  transition: color .25s, text-shadow .25s;
+}
+.mob-nav a:hover { color: var(--cyan); text-shadow: var(--glow); }
+.mob-close {
+  position: absolute; top: 28px; right: 5%;
+  background: none; border: 1px solid var(--border); border-radius: 4px;
+  color: var(--muted); font-size: 1.2rem; padding: 8px 12px;
+  transition: color .2s, border-color .2s;
+}
+.mob-close:hover { color: var(--cyan); border-color: var(--cyan); }
+
+/* ═══════════════════════════════════════════════════
+   SECTION DIVIDER
+═══════════════════════════════════════════════════ */
+.sec-div {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(0,245,255,.2), transparent);
+  position: relative; overflow: visible;
+}
+.sec-div::after {
+  content: '◆';
+  position: absolute; left: 50%; top: 50%;
+  transform: translate(-50%,-50%);
+  font-size: .45rem; color: var(--cyan);
+  opacity: .6;
+}
+
+/* ═══════════════════════════════════════════════════
+   SHARED SECTION STYLES
+═══════════════════════════════════════════════════ */
+section { padding: 110px 5%; position: relative; overflow: hidden; }
+.sec-tag {
+  font-family: var(--fr); font-size: .7rem; font-weight: 600;
+  text-transform: uppercase; letter-spacing: .25em; color: var(--cyan);
+  margin-bottom: 14px; display: block;
+}
+.sec-tag::before { content: '// '; opacity: .45; }
+h2.sec-title {
+  font-family: var(--fd); font-size: clamp(1.8rem, 4vw, 2.8rem);
+  font-weight: 900; letter-spacing: -.01em; line-height: 1.08;
+  margin-bottom: 18px;
+}
+.hl {
+  background: var(--grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+.hl2 {
+  background: var(--grad2); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+.sec-desc {
+  color: var(--muted); font-size: .92rem; max-width: 500px;
+  line-height: 1.9; margin-bottom: 52px;
+}
+.sec-center { text-align: center; }
+.sec-center .sec-desc { margin: 0 auto 52px; }
+
+/* SCROLL REVEAL */
+.reveal {
+  opacity: 0; transform: translateY(40px);
+  transition: opacity .9s cubic-bezier(.4,0,.2,1), transform .9s cubic-bezier(.4,0,.2,1);
+}
+.reveal.vis { opacity: 1; transform: none; }
+
+/* ═══════════════════════════════════════════════════
+   HERO SECTION
+═══════════════════════════════════════════════════ */
+#hero {
+  min-height: 100vh;
+  display: flex; align-items: center;
+  padding: 120px 5% 80px;
+  position: relative; overflow: hidden;
+}
+#hero-canvas {
+  position: absolute; inset: 0; z-index: 1;
+  pointer-events: none;
+}
+.hero-grid-lines {
+  position: absolute; inset: 0; z-index: 0;
+  background-image:
+    linear-gradient(rgba(0,245,255,.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,245,255,.025) 1px, transparent 1px);
+  background-size: 60px 60px;
+  animation: gridPan 20s linear infinite;
+}
+@keyframes gridPan { from { transform: translateY(0); } to { transform: translateY(60px); } }
+.hero-scanlines {
+  position: absolute; inset: 0; z-index: 0; pointer-events: none;
+  background: repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,245,255,.012) 3px, rgba(0,245,255,.012) 4px);
+}
+.hero-radials {
+  position: absolute; inset: 0; z-index: 0;
+  background:
+    radial-gradient(ellipse 55% 70% at 75% 55%, rgba(139,0,255,.14) 0%, transparent 65%),
+    radial-gradient(ellipse 45% 50% at 20% 60%, rgba(0,245,255,.09) 0%, transparent 60%),
+    radial-gradient(ellipse 35% 40% at 85% 10%, rgba(255,45,120,.07) 0%, transparent 55%);
+}
+.hero-content {
+  position: relative; z-index: 2;
+  max-width: 620px;
+}
+.hero-badge {
+  display: inline-flex; align-items: center; gap: 10px;
+  padding: 7px 20px; border-radius: 2px;
+  border: 1px solid rgba(0,245,255,.3);
+  background: rgba(0,245,255,.06);
+  font-family: var(--fr); font-size: .7rem; color: var(--cyan);
+  letter-spacing: .18em; text-transform: uppercase;
+  margin-bottom: 30px; backdrop-filter: blur(10px);
+}
+.hero-badge::before {
+  content: ''; width: 7px; height: 7px; border-radius: 50%;
+  background: var(--green); box-shadow: 0 0 12px var(--green);
+  flex-shrink: 0; animation: blink1 2s infinite;
+}
+.hero-name {
+  font-family: var(--fd);
+  font-size: clamp(3.2rem, 7.5vw, 6.5rem);
+  font-weight: 900; line-height: .9;
+  letter-spacing: -.03em; margin-bottom: 8px;
+  background: linear-gradient(135deg, #ffffff 0%, #a8e6ff 40%, var(--cyan) 65%, var(--purple) 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  text-shadow: none;
+}
+.hero-glitch {
+  position: relative; display: inline-block;
+}
+.hero-glitch::before, .hero-glitch::after {
+  content: attr(data-text);
+  position: absolute; top: 0; left: 0;
+  background: linear-gradient(135deg, #ffffff 0%, #a8e6ff 40%, var(--cyan) 65%, var(--purple) 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+.hero-glitch::before {
+  animation: glitch1 4s infinite; clip-path: polygon(0 0, 100% 0, 100% 35%, 0 35%);
+  transform: translateX(-2px); opacity: .7;
+}
+.hero-glitch::after {
+  animation: glitch2 4s infinite; clip-path: polygon(0 65%, 100% 65%, 100% 100%, 0 100%);
+  transform: translateX(2px); opacity: .7;
+}
+@keyframes glitch1 {
+  0%,89%,100%{transform:translateX(0);opacity:0}
+  90%{transform:translateX(-3px);opacity:.7}
+  91%{transform:translateX(3px);opacity:.7}
+  92%{transform:translateX(0);opacity:0}
+}
+@keyframes glitch2 {
+  0%,87%,100%{transform:translateX(0);opacity:0}
+  88%{transform:translateX(3px);opacity:.7}
+  89%{transform:translateX(-3px);opacity:.7}
+  90%{transform:translateX(0);opacity:0}
+}
+.hero-sub {
+  font-family: var(--fr); font-size: clamp(.9rem, 2vw, 1.35rem);
+  font-weight: 600; color: var(--cyan);
+  letter-spacing: .22em; text-transform: uppercase;
+  margin-bottom: 26px; text-shadow: 0 0 20px rgba(0,245,255,.5);
+}
+.hero-desc {
+  font-size: .94rem; color: var(--muted);
+  max-width: 500px; line-height: 1.95; margin-bottom: 44px;
+}
+.hero-btns { display: flex; gap: 18px; flex-wrap: wrap; }
+.btn-primary {
+  display: inline-flex; align-items: center; gap: 10px;
+  padding: 15px 36px; border: 1px solid var(--cyan); border-radius: 3px;
+  color: var(--cyan); font-family: var(--fr); font-size: .88rem;
+  font-weight: 700; text-transform: uppercase; letter-spacing: .1em;
+  position: relative; overflow: hidden; transition: color .3s, box-shadow .3s;
+}
+.btn-primary::before {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(135deg, var(--cyan), var(--blue));
+  transform: translateX(-100%); transition: transform .35s; z-index: -1;
+}
+.btn-primary:hover { color: var(--bg); box-shadow: var(--glow); }
+.btn-primary:hover::before { transform: translateX(0); }
+.btn-secondary {
+  display: inline-flex; align-items: center; gap: 10px;
+  padding: 15px 36px; border: 1px solid rgba(255,45,120,.35); border-radius: 3px;
+  color: var(--white); font-family: var(--fr); font-size: .88rem;
+  font-weight: 700; text-transform: uppercase; letter-spacing: .1em;
+  background: rgba(255,45,120,.06); transition: all .3s;
+}
+.btn-secondary:hover {
+  border-color: var(--pink); color: var(--pink); box-shadow: var(--glow3);
+}
+/* HERO STATS */
+.hero-stats-row {
+  display: flex; gap: 40px; margin-top: 52px; flex-wrap: wrap;
+}
+.hstat { display: flex; flex-direction: column; gap: 2px; position: relative; }
+.hstat::after {
+  content: ''; position: absolute; right: -20px; top: 10%; bottom: 10%;
+  width: 1px; background: linear-gradient(180deg, transparent, rgba(0,245,255,.25), transparent);
+}
+.hstat:last-child::after { display: none; }
+.hstat-num {
+  font-family: var(--fd); font-size: 2rem; font-weight: 900; line-height: 1;
+  background: var(--grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+.hstat-lbl { font-family: var(--fr); font-size: .66rem; color: var(--muted); letter-spacing: .15em; text-transform: uppercase; }
+
+/* SCROLL INDICATOR */
+.scroll-ind {
+  position: absolute; bottom: 36px; left: 5%; z-index: 2;
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+}
+.scroll-ind span {
+  font-family: var(--fr); font-size: .62rem; color: var(--muted);
+  letter-spacing: .2em; text-transform: uppercase;
+}
+.scroll-dot {
+  width: 24px; height: 36px; border: 1.5px solid rgba(0,245,255,.3); border-radius: 12px;
+  position: relative;
+}
+.scroll-dot::after {
+  content: ''; position: absolute; width: 5px; height: 5px;
+  background: var(--cyan); border-radius: 50%;
+  left: 50%; transform: translateX(-50%); top: 5px;
+  animation: scrollAnim 2s ease-in-out infinite;
+  box-shadow: 0 0 8px var(--cyan);
+}
+@keyframes scrollAnim {
+  0%{top:5px;opacity:1} 70%{top:20px;opacity:.2} 100%{top:5px;opacity:1}
+}
+
+/* ═══════════════════════════════════════════════════
+   ABOUT SECTION
+═══════════════════════════════════════════════════ */
+#about { background: var(--bg2); }
+.about-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center;
+}
+.about-glass {
+  background: rgba(0,245,255,.03);
+  border: 1px solid var(--border);
+  border-radius: 16px; padding: 48px;
+  backdrop-filter: blur(20px);
+  box-shadow: 0 30px 80px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.05);
+  position: relative; overflow: hidden;
+}
+.about-glass::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: var(--grad);
+}
+.about-photo-ring {
+  width: 90px; height: 90px; border-radius: 50%;
+  margin-bottom: 26px; position: relative;
+}
+.about-photo-ring::before {
+  content: ''; position: absolute; inset: -3px; border-radius: 50%;
+  background: var(--grad); z-index: -1;
+  animation: rotateBorder 3s linear infinite;
+}
+@keyframes rotateBorder {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+.about-photo-ring img {
+  width: 100%; height: 100%; border-radius: 50%; object-fit: cover;
+  filter: saturate(1.1);
+}
+.about-bio {
+  font-size: .92rem; color: var(--muted); line-height: 1.95; margin-bottom: 32px;
+}
+/* SKILLS BARS */
+.skills-list { display: flex; flex-direction: column; gap: 16px; }
+.skill-item {}
+.skill-head { display: flex; justify-content: space-between; margin-bottom: 6px; }
+.skill-name { font-family: var(--fr); font-size: .82rem; font-weight: 600; color: var(--white); letter-spacing: .06em; }
+.skill-pct { font-family: var(--fd); font-size: .7rem; color: var(--cyan); }
+.skill-bar {
+  height: 4px; background: rgba(0,245,255,.08); border-radius: 99px; overflow: hidden;
+}
+.skill-fill {
+  height: 100%; width: 0; border-radius: 99px;
+  transition: width 1.4s cubic-bezier(.4,0,.2,1);
+  position: relative;
+}
+.skill-fill::after {
+  content: ''; position: absolute; right: 0; top: -4px;
+  width: 12px; height: 12px; border-radius: 50%;
+  background: inherit; box-shadow: 0 0 12px currentColor;
+}
+.sf1 { background: linear-gradient(90deg, var(--cyan), var(--blue)); }
+.sf2 { background: linear-gradient(90deg, var(--purple), var(--pink)); }
+.sf3 { background: linear-gradient(90deg, var(--green), var(--cyan)); }
+.sf4 { background: linear-gradient(90deg, var(--pink), var(--purple)); }
+.sf5 { background: linear-gradient(90deg, var(--blue), var(--cyan)); }
+
+/* 3D ROTATING CUBE */
+.about-visual {
+  display: flex; align-items: center; justify-content: center;
+  position: relative; height: 500px;
+}
+.cube-scene {
+  perspective: 700px;
+  width: 200px; height: 200px;
+}
+.cube-3d {
+  width: 200px; height: 200px;
+  transform-style: preserve-3d;
+  animation: rotateCube 12s linear infinite;
+  position: relative;
+}
+@keyframes rotateCube {
+  0% { transform: rotateX(20deg) rotateY(0deg) rotateZ(5deg); }
+  100% { transform: rotateX(20deg) rotateY(360deg) rotateZ(5deg); }
+}
+.cube-face {
+  position: absolute; width: 200px; height: 200px;
+  background: rgba(0,245,255,.04);
+  border: 1px solid rgba(0,245,255,.25);
+  display: flex; align-items: center; justify-content: center;
+  backface-visibility: visible;
+}
+.cube-face::before {
+  content: ''; position: absolute; inset: 8px;
+  border: 1px solid rgba(0,245,255,.1);
+}
+.cube-face::after {
+  content: ''; position: absolute;
+  width: 3px; height: 3px; border-radius: 50%;
+  background: var(--cyan); box-shadow: var(--glow);
+}
+.cf-f { transform: translateZ(100px); }
+.cf-b { transform: rotateY(180deg) translateZ(100px); }
+.cf-l { transform: rotateY(-90deg) translateZ(100px); }
+.cf-r { transform: rotateY(90deg) translateZ(100px); }
+.cf-t { transform: rotateX(90deg) translateZ(100px); }
+.cf-bo { transform: rotateX(-90deg) translateZ(100px); }
+.cube-glow {
+  position: absolute; width: 300px; height: 300px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(0,245,255,.12) 0%, transparent 70%);
+  animation: blink1 3s ease-in-out infinite;
+  pointer-events: none;
+}
+/* Floating orbs */
+.orb {
+  position: absolute; border-radius: 50%;
+  animation: orbFloat linear infinite;
+}
+.orb1 { width: 8px; height: 8px; background: var(--cyan); top: 30%; right: 20%; animation-duration: 4s; box-shadow: 0 0 12px var(--cyan); }
+.orb2 { width: 5px; height: 5px; background: var(--purple); top: 65%; left: 18%; animation-duration: 5.5s; box-shadow: 0 0 10px var(--purple); }
+.orb3 { width: 6px; height: 6px; background: var(--pink); top: 20%; left: 25%; animation-duration: 6s; box-shadow: 0 0 10px var(--pink); }
+@keyframes orbFloat {
+  0%,100% { transform: translateY(0) translateX(0); opacity: .8; }
+  25% { transform: translateY(-18px) translateX(10px); opacity: 1; }
+  50% { transform: translateY(-10px) translateX(-8px); opacity: .6; }
+  75% { transform: translateY(-22px) translateX(5px); opacity: 1; }
+}
+/* Experience Tags */
+.exp-tags { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 28px; }
+.exp-tag {
+  padding: 6px 16px; border-radius: 2px;
+  border: 1px solid rgba(0,245,255,.2);
+  background: rgba(0,245,255,.05);
+  font-family: var(--fr); font-size: .7rem; color: var(--cyan);
+  letter-spacing: .1em; text-transform: uppercase;
+}
+
+/* ═══════════════════════════════════════════════════
+   3D MODELING SKILLS
+═══════════════════════════════════════════════════ */
+#skills3d { background: var(--bg3); }
+.skills3d-grid {
+  display: grid; grid-template-columns: repeat(6, 1fr); gap: 16px;
+}
+.s3d-card {
+  aspect-ratio: 1;
+  background: rgba(0,245,255,.03);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 10px; padding: 20px 10px;
+  transition: all .35s cubic-bezier(.4,0,.2,1);
+  position: relative; overflow: hidden; cursor: none;
+}
+.s3d-card::before {
+  content: ''; position: absolute; inset: 0; border-radius: 12px;
+  background: var(--grad); opacity: 0; transition: opacity .35s; z-index: 0;
+}
+.s3d-card:hover::before { opacity: .08; }
+.s3d-card:hover {
+  border-color: var(--cyan);
+  box-shadow: 0 0 30px rgba(0,245,255,.15), 0 20px 60px rgba(0,0,0,.5);
+  transform: translateY(-6px) scale(1.03);
+}
+.s3d-icon {
+  font-size: 2rem; z-index: 1;
+  filter: drop-shadow(0 0 8px rgba(0,245,255,.4));
+  transition: transform .35s;
+}
+.s3d-card:hover .s3d-icon { transform: scale(1.15); }
+.s3d-name {
+  font-family: var(--fr); font-size: .72rem; font-weight: 700;
+  color: var(--muted); text-transform: uppercase; letter-spacing: .06em;
+  text-align: center; z-index: 1; transition: color .3s;
+  line-height: 1.3;
+}
+.s3d-card:hover .s3d-name { color: var(--cyan); }
+.s3d-level {
+  display: flex; gap: 4px; z-index: 1;
+}
+.s3d-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: rgba(0,245,255,.15); border: 1px solid rgba(0,245,255,.2);
+  transition: all .3s;
+}
+.s3d-dot.on { background: var(--cyan); box-shadow: 0 0 6px var(--cyan); border-color: var(--cyan); }
+
+/* ═══════════════════════════════════════════════════
+   TOOLS SECTION
+═══════════════════════════════════════════════════ */
+#tools { background: var(--bg2); }
+.tools-grid {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px;
+}
+.tool-card {
+  background: rgba(0,245,255,.03);
+  border: 1px solid var(--border);
+  border-radius: 14px; padding: 32px 24px;
+  display: flex; flex-direction: column; align-items: center; gap: 16px;
+  transition: all .4s cubic-bezier(.4,0,.2,1);
+  position: relative; overflow: hidden; cursor: none;
+  text-decoration: none;
+  animation: toolFloat linear infinite;
+}
+.tool-card:nth-child(1) { animation-duration: 5s; }
+.tool-card:nth-child(2) { animation-duration: 5.8s; animation-delay: .3s; }
+.tool-card:nth-child(3) { animation-duration: 6.2s; animation-delay: .7s; }
+.tool-card:nth-child(4) { animation-duration: 5.5s; animation-delay: 1s; }
+.tool-card:nth-child(5) { animation-duration: 6.8s; animation-delay: .5s; }
+.tool-card:nth-child(6) { animation-duration: 5.2s; animation-delay: .2s; }
+.tool-card:nth-child(7) { animation-duration: 6s; animation-delay: .8s; }
+.tool-card:nth-child(8) { animation-duration: 5.7s; animation-delay: .4s; }
+@keyframes toolFloat {
+  0%,100%{transform:translateY(0)}
+  50%{transform:translateY(-10px)}
+}
+.tool-card::after {
+  content: ''; position: absolute; inset: 0; border-radius: 14px;
+  background: radial-gradient(circle at 50% 0%, rgba(0,245,255,.12) 0%, transparent 60%);
+  opacity: 0; transition: opacity .4s;
+}
+.tool-card:hover { border-color: var(--cyan); box-shadow: 0 0 40px rgba(0,245,255,.2), 0 24px 60px rgba(0,0,0,.5); animation-play-state: paused; transform: translateY(-12px) scale(1.04); }
+.tool-card:hover::after { opacity: 1; }
+.tool-icon-wrap {
+  width: 70px; height: 70px; border-radius: 16px;
+  display: flex; align-items: center; justify-content: center;
+  border: 1px solid rgba(0,245,255,.15);
+  transition: box-shadow .4s, border-color .4s;
+  position: relative; z-index: 1;
+}
+.tool-card:hover .tool-icon-wrap {
+  box-shadow: 0 0 24px rgba(0,245,255,.3);
+  border-color: rgba(0,245,255,.4);
+}
+.tool-icon { font-size: 2rem; }
+.tool-name {
+  font-family: var(--fr); font-size: .88rem; font-weight: 700;
+  color: var(--white); text-transform: uppercase; letter-spacing: .08em;
+  text-align: center; position: relative; z-index: 1;
+  transition: color .3s;
+}
+.tool-card:hover .tool-name { color: var(--cyan); }
+.tool-tag {
+  font-family: var(--fr); font-size: .62rem; color: var(--muted);
+  letter-spacing: .1em; text-transform: uppercase;
+  position: relative; z-index: 1;
+}
+.tool-link {
+  position: absolute; top: 12px; right: 14px;
+  width: 24px; height: 24px;
+  border: 1px solid rgba(0,245,255,.2); border-radius: 4px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: .6rem; color: var(--muted);
+  opacity: 0; transition: opacity .3s;
+  z-index: 2;
+}
+.tool-card:hover .tool-link { opacity: 1; }
+
+/* Tool gradient backgrounds */
+.tg1 { background: linear-gradient(135deg,rgba(249,122,0,.06),rgba(255,135,0,.03)); }
+.tg2 { background: linear-gradient(135deg,rgba(0,175,225,.06),rgba(0,200,200,.03)); }
+.tg3 { background: linear-gradient(135deg,rgba(220,60,60,.06),rgba(180,40,40,.03)); }
+.tg4 { background: linear-gradient(135deg,rgba(90,40,200,.06),rgba(120,60,220,.03)); }
+.tg5 { background: linear-gradient(135deg,rgba(0,200,100,.06),rgba(0,245,180,.03)); }
+.tg6 { background: linear-gradient(135deg,rgba(60,80,250,.06),rgba(30,60,200,.03)); }
+.tg7 { background: linear-gradient(135deg,rgba(148,0,211,.06),rgba(100,0,180,.03)); }
+.tg8 { background: linear-gradient(135deg,rgba(0,100,200,.06),rgba(0,80,180,.03)); }
+
+/* ═══════════════════════════════════════════════════
+   PORTFOLIO SECTION
+═══════════════════════════════════════════════════ */
+#portfolio { background: var(--bg); }
+.port-filters {
+  display: flex; gap: 10px; flex-wrap: wrap;
+  justify-content: center; margin-bottom: 52px;
+}
+.pf-btn {
+  padding: 9px 24px; border-radius: 3px;
+  border: 1px solid var(--border);
+  background: var(--surf); color: var(--muted);
+  font-family: var(--fr); font-size: .74rem; font-weight: 600;
+  text-transform: uppercase; letter-spacing: .1em;
+  transition: all .25s; cursor: none;
+}
+.pf-btn.active, .pf-btn:hover {
+  border-color: var(--cyan); color: var(--cyan);
+  background: rgba(0,245,255,.06);
+  box-shadow: 0 0 16px rgba(0,245,255,.12);
+}
+.port-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); gap: 22px;
+}
+.port-card {
+  border-radius: 12px; border: 1px solid var(--border);
+  overflow: hidden; background: var(--surf);
+  cursor: none; transition: border-color .3s, box-shadow .3s;
+  position: relative; transform-style: preserve-3d;
+}
+.port-card:hover { border-color: rgba(0,245,255,.4); box-shadow: 0 24px 64px rgba(0,0,0,.6), 0 0 40px rgba(0,245,255,.08); }
+.port-card.wide { grid-column: span 2; }
+.port-img { width: 100%; overflow: hidden; position: relative; }
+.port-card:not(.wide) .port-img { aspect-ratio: 4/3; }
+.port-card.wide .port-img { aspect-ratio: 16/7; }
+.port-img img { width: 100%; height: 100%; object-fit: cover; transition: transform .7s cubic-bezier(.4,0,.2,1); display: block; }
+.port-card:hover .port-img img { transform: scale(1.1); }
+.port-overlay {
+  position: absolute; inset: 0;
+  background: linear-gradient(135deg, rgba(0,71,255,.9), rgba(139,0,255,.9));
+  display: flex; align-items: center; justify-content: center;
+  flex-direction: column; gap: 16px;
+  opacity: 0; transition: opacity .4s;
+}
+.port-card:hover .port-overlay { opacity: 1; }
+.port-ov-cat {
+  font-family: var(--fr); font-size: .65rem; color: rgba(255,255,255,.7);
+  letter-spacing: .2em; text-transform: uppercase;
+}
+.port-ov-title {
+  font-family: var(--fd); font-size: 1rem; font-weight: 800;
+  color: #fff; text-align: center; padding: 0 24px;
+}
+.port-ov-btn {
+  padding: 9px 26px;
+  border: 1.5px solid rgba(255,255,255,.6); border-radius: 3px;
+  color: #fff; font-family: var(--fr); font-size: .7rem;
+  text-transform: uppercase; letter-spacing: .12em;
+  transition: all .25s;
+}
+.port-ov-btn:hover { background: rgba(255,255,255,.15); }
+.port-info { padding: 18px 20px; }
+.port-cat { font-family: var(--fr); font-size: .62rem; text-transform: uppercase; letter-spacing: .14em; color: var(--cyan); margin-bottom: 5px; }
+.port-title { font-family: var(--fd); font-size: .82rem; font-weight: 700; color: var(--white); }
+
+/* PROJECT DETAIL MODAL */
+#project-modal {
+  position: fixed; inset: 0; z-index: 90000;
+  background: rgba(2,4,8,.97); backdrop-filter: blur(30px);
+  overflow-y: auto; opacity: 0; visibility: hidden;
+  transition: opacity .4s, visibility .4s;
+}
+#project-modal.open { opacity: 1; visibility: visible; }
+.modal-inner { max-width: 1000px; margin: 0 auto; padding: 80px 5%; }
+.modal-close-btn {
+  position: fixed; top: 24px; right: 5%;
+  background: rgba(0,245,255,.08);
+  border: 1px solid var(--border); border-radius: 8px;
+  color: var(--white); font-size: 1rem; padding: 10px 16px;
+  cursor: none; transition: all .2s;
+  font-family: var(--fr); letter-spacing: .05em;
+}
+.modal-close-btn:hover { border-color: var(--cyan); color: var(--cyan); box-shadow: var(--glow); }
+.modal-banner {
+  width: 100%; aspect-ratio: 16/7; border-radius: 12px; overflow: hidden;
+  margin-bottom: 40px; border: 1px solid var(--border);
+  position: relative;
+}
+.modal-banner img { width: 100%; height: 100%; object-fit: cover; }
+.modal-banner-overlay {
+  position: absolute; inset: 0;
+  background: linear-gradient(180deg, transparent 40%, rgba(2,4,8,.95));
+  display: flex; align-items: flex-end; padding: 40px;
+}
+.modal-title { font-family: var(--fd); font-size: clamp(1.6rem, 3vw, 2.4rem); font-weight: 900; color: var(--white); }
+.modal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 40px; }
+.modal-section-title {
+  font-family: var(--fr); font-size: .7rem; color: var(--cyan);
+  text-transform: uppercase; letter-spacing: .2em; margin-bottom: 14px;
+}
+.modal-section-title::before { content: '// '; opacity: .45; }
+.modal-text { font-size: .9rem; color: var(--muted); line-height: 1.9; }
+.modal-tags { display: flex; gap: 10px; flex-wrap: wrap; }
+.modal-tag {
+  padding: 5px 14px; border-radius: 3px;
+  border: 1px solid rgba(0,245,255,.2);
+  background: rgba(0,245,255,.05);
+  font-family: var(--fr); font-size: .68rem; color: var(--cyan);
+  letter-spacing: .08em;
+}
+.modal-gallery { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 40px; }
+.modal-gallery img { width: 100%; border-radius: 8px; border: 1px solid var(--border); aspect-ratio: 4/3; object-fit: cover; }
+.modal-feedback {
+  background: rgba(0,245,255,.03); border: 1px solid var(--border);
+  border-radius: 12px; padding: 32px; position: relative;
+}
+.modal-feedback::before { content: '"'; position: absolute; top: 16px; right: 24px; font-family: var(--fd); font-size: 5rem; color: var(--cyan); opacity: .1; line-height: 1; }
+.modal-quote { font-size: .92rem; color: var(--muted); font-style: italic; line-height: 1.9; margin-bottom: 20px; }
+.modal-client { font-family: var(--fr); font-size: .8rem; color: var(--cyan); font-weight: 700; }
+.modal-process {
+  display: flex; flex-direction: column; gap: 16px; margin-bottom: 40px;
+}
+.process-step {
+  display: flex; gap: 20px; align-items: flex-start;
+  background: rgba(0,245,255,.03); border: 1px solid var(--border); border-radius: 10px; padding: 20px;
+}
+.process-num {
+  font-family: var(--fd); font-size: 1.4rem; font-weight: 900; color: var(--cyan); opacity: .3;
+  flex-shrink: 0; line-height: 1;
+}
+.process-step h4 { font-family: var(--fr); font-size: .9rem; color: var(--white); margin-bottom: 6px; }
+.process-step p { font-size: .82rem; color: var(--muted); line-height: 1.8; }
+
+/* ═══════════════════════════════════════════════════
+   SERVICES SECTION
+═══════════════════════════════════════════════════ */
+#services { background: var(--bg2); }
+.serv-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px;
+}
+.serv-card {
+  background: var(--surf); border: 1px solid var(--border);
+  border-radius: 14px; padding: 36px 30px;
+  transition: all .4s cubic-bezier(.4,0,.2,1);
+  position: relative; overflow: hidden; cursor: none;
+}
+.serv-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: var(--grad); transform: scaleX(0); transition: transform .4s;
+}
+.serv-card:hover::before { transform: scaleX(1); }
+.serv-card:hover {
+  border-color: rgba(0,245,255,.3);
+  box-shadow: 0 24px 70px rgba(0,0,0,.5), 0 0 40px rgba(0,245,255,.06);
+  transform: translateY(-8px);
+}
+.serv-card.featured {
+  border-color: rgba(0,245,255,.3);
+  background: rgba(0,245,255,.05);
+  box-shadow: 0 0 40px rgba(0,245,255,.08);
+}
+.serv-card.featured::before { transform: scaleX(1); }
+.feat-badge {
+  position: absolute; top: 20px; right: 20px;
+  padding: 4px 12px; border-radius: 3px;
+  background: linear-gradient(135deg, var(--cyan), var(--purple));
+  font-family: var(--fr); font-size: .62rem; font-weight: 700;
+  color: var(--bg); text-transform: uppercase; letter-spacing: .1em;
+}
+.serv-icon-wrap {
+  width: 58px; height: 58px; border-radius: 12px;
+  background: rgba(0,245,255,.07); border: 1px solid rgba(0,245,255,.15);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.4rem; margin-bottom: 22px;
+  transition: box-shadow .3s, border-color .3s;
+}
+.serv-card:hover .serv-icon-wrap { border-color: rgba(0,245,255,.4); box-shadow: 0 0 20px rgba(0,245,255,.15); }
+.serv-name {
+  font-family: var(--fr); font-size: 1rem; font-weight: 700;
+  color: var(--white); text-transform: uppercase; letter-spacing: .06em;
+  margin-bottom: 12px;
+}
+.serv-desc { font-size: .84rem; color: var(--muted); line-height: 1.85; margin-bottom: 24px; }
+.serv-features { list-style: none; display: flex; flex-direction: column; gap: 8px; margin-bottom: 24px; }
+.serv-features li {
+  font-family: var(--fr); font-size: .76rem; color: var(--muted);
+  letter-spacing: .04em; display: flex; align-items: center; gap: 8px;
+}
+.serv-features li::before {
+  content: ''; width: 5px; height: 5px; border-radius: 50%;
+  background: var(--cyan); box-shadow: 0 0 6px var(--cyan); flex-shrink: 0;
+}
+.serv-price {
+  font-family: var(--fd); font-size: 1.1rem; font-weight: 700;
+  background: var(--grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+.serv-cta {
+  display: inline-flex; align-items: center; gap: 8px;
+  margin-top: 20px; padding: 10px 24px;
+  border: 1px solid rgba(0,245,255,.25); border-radius: 4px;
+  color: var(--cyan); font-family: var(--fr); font-size: .76rem;
+  font-weight: 700; text-transform: uppercase; letter-spacing: .1em;
+  transition: all .3s; width: 100%; justify-content: center;
+}
+.serv-cta:hover { background: rgba(0,245,255,.1); border-color: var(--cyan); box-shadow: 0 0 20px rgba(0,245,255,.15); }
+
+/* ═══════════════════════════════════════════════════
+   TESTIMONIALS
+═══════════════════════════════════════════════════ */
+#testimonials { background: var(--bg3); }
+.test-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px;
+}
+.test-card {
+  background: rgba(0,245,255,.03);
+  border: 1px solid var(--border); border-radius: 14px; padding: 36px;
+  backdrop-filter: blur(16px);
+  transition: transform .35s, border-color .35s, box-shadow .35s;
+  position: relative; overflow: hidden;
+}
+.test-card::before {
+  content: '"'; position: absolute; top: 18px; right: 26px;
+  font-family: var(--fd); font-size: 6rem; font-weight: 900;
+  color: var(--cyan); opacity: .06; line-height: 1;
+}
+.test-card:hover {
+  transform: translateY(-6px);
+  border-color: rgba(0,245,255,.25);
+  box-shadow: 0 24px 60px rgba(0,0,0,.4), 0 0 30px rgba(0,245,255,.06);
+}
+.test-stars { color: var(--gold); font-size: .85rem; letter-spacing: 4px; margin-bottom: 18px; }
+.test-text {
+  font-size: .86rem; color: var(--muted); line-height: 1.95;
+  margin-bottom: 24px; font-style: italic; position: relative; z-index: 1;
+}
+.test-author { display: flex; align-items: center; gap: 14px; }
+.test-avatar {
+  width: 48px; height: 48px; border-radius: 50%; overflow: hidden; flex-shrink: 0;
+  border: 2px solid transparent;
+  background: linear-gradient(var(--bg2), var(--bg2)) padding-box,
+              var(--grad) border-box;
+}
+.test-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.test-name { font-family: var(--fr); font-size: .88rem; font-weight: 700; color: var(--white); }
+.test-role { font-size: .72rem; color: var(--muted); }
+
+/* ═══════════════════════════════════════════════════
+   CONTACT SECTION
+═══════════════════════════════════════════════════ */
+#contact { background: var(--bg4); }
+.contact-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 70px; align-items: start;
+}
+.contact-info { display: flex; flex-direction: column; gap: 16px; }
+.contact-tagline { font-size: .93rem; color: var(--muted); line-height: 1.9; margin-bottom: 32px; max-width: 380px; }
+.c-item {
+  display: flex; align-items: center; gap: 16px;
+  padding: 18px 20px; border-radius: 10px;
+  border: 1px solid var(--border); background: var(--surf);
+  color: var(--white); text-decoration: none;
+  transition: all .3s;
+}
+.c-item:hover { border-color: var(--cyan); transform: translateX(6px); box-shadow: 0 0 24px rgba(0,245,255,.1); }
+.c-ico {
+  width: 46px; height: 46px; border-radius: 10px;
+  background: rgba(0,245,255,.07); border: 1px solid rgba(0,245,255,.15);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.1rem; flex-shrink: 0; transition: box-shadow .3s;
+}
+.c-item:hover .c-ico { box-shadow: 0 0 16px rgba(0,245,255,.2); border-color: rgba(0,245,255,.35); }
+.c-lbl { font-family: var(--fr); font-size: .62rem; color: var(--muted); text-transform: uppercase; letter-spacing: .12em; }
+.c-val { font-family: var(--fr); font-size: .88rem; font-weight: 700; color: var(--white); }
+.wa-btn {
+  display: flex; align-items: center; justify-content: center; gap: 12px;
+  padding: 16px; border-radius: 10px;
+  background: linear-gradient(135deg, rgba(37,211,102,.15), rgba(37,211,102,.05));
+  border: 1px solid rgba(37,211,102,.3);
+  color: #25d366; font-family: var(--fr); font-size: .9rem; font-weight: 700;
+  text-decoration: none; text-transform: uppercase; letter-spacing: .1em;
+  transition: all .3s;
+}
+.wa-btn:hover { background: rgba(37,211,102,.2); box-shadow: 0 0 30px rgba(37,211,102,.2); transform: translateY(-3px); }
+/* CONTACT FORM */
+.c-form { display: flex; flex-direction: column; gap: 18px; }
+.fg { display: flex; flex-direction: column; gap: 7px; }
+.fg label { font-family: var(--fr); font-size: .68rem; color: var(--muted); text-transform: uppercase; letter-spacing: .12em; }
+.fg input, .fg textarea, .fg select {
+  background: rgba(0,245,255,.03); border: 1px solid rgba(0,245,255,.1);
+  border-radius: 8px; padding: 13px 16px;
+  color: var(--white); font-family: var(--fb); font-size: .88rem;
+  outline: none; transition: border-color .25s, box-shadow .25s; resize: vertical;
+  -webkit-appearance: none;
+}
+.fg input:focus, .fg textarea:focus, .fg select:focus {
+  border-color: var(--cyan); box-shadow: 0 0 0 3px rgba(0,245,255,.07), var(--glow);
+}
+.fg select option { background: #060c14; }
+.fgrow { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.form-submit {
+  display: inline-flex; align-items: center; gap: 10px;
+  padding: 15px 36px; border: 1px solid var(--cyan); border-radius: 4px;
+  background: rgba(0,245,255,.05); color: var(--cyan);
+  font-family: var(--fr); font-size: .88rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .12em;
+  transition: all .3s; position: relative; overflow: hidden;
+}
+.form-submit::before {
+  content: ''; position: absolute; inset: 0;
+  background: var(--grad3); transform: scaleX(0); transform-origin: left; z-index: -1;
+  transition: transform .35s;
+}
+.form-submit:hover { color: var(--bg); box-shadow: var(--glow); }
+.form-submit:hover::before { transform: scaleX(1); }
+
+/* ═══════════════════════════════════════════════════
+   FOOTER
+═══════════════════════════════════════════════════ */
+footer {
+  padding: 50px 5% 30px;
+  border-top: 1px solid var(--border);
+  background: var(--bg);
+}
+.footer-top {
+  display: flex; justify-content: space-between; align-items: center;
+  gap: 30px; flex-wrap: wrap; margin-bottom: 36px;
+}
+.footer-logo-txt {
+  font-family: var(--fd); font-size: 1.1rem; font-weight: 900;
+  background: var(--grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  letter-spacing: .1em;
+}
+.footer-tagline { font-family: var(--fr); font-size: .72rem; color: var(--muted); letter-spacing: .1em; text-transform: uppercase; }
+.footer-nav-links { display: flex; gap: 24px; flex-wrap: wrap; }
+.footer-nav-links a {
+  font-family: var(--fr); font-size: .74rem; color: var(--muted);
+  text-transform: uppercase; letter-spacing: .1em; transition: color .25s;
+}
+.footer-nav-links a:hover { color: var(--cyan); }
+.footer-socials { display: flex; gap: 10px; }
+.fsoc-btn {
+  width: 40px; height: 40px; border-radius: 8px;
+  border: 1px solid var(--border); background: var(--surf);
+  display: flex; align-items: center; justify-content: center;
+  font-size: .9rem; text-decoration: none; color: var(--muted);
+  transition: all .25s;
+}
+.fsoc-btn:hover { border-color: var(--cyan); color: var(--cyan); box-shadow: 0 0 14px rgba(0,245,255,.2); transform: translateY(-3px); }
+.footer-bottom {
+  display: flex; justify-content: space-between; align-items: center;
+  flex-wrap: wrap; gap: 12px; padding-top: 28px;
+  border-top: 1px solid rgba(0,245,255,.07);
+}
+.footer-copy { font-family: var(--fr); font-size: .7rem; color: var(--muted); letter-spacing: .08em; }
+.footer-credit {
+  font-family: var(--fr); font-size: .7rem; color: var(--muted);
+  display: flex; align-items: center; gap: 6px;
+}
+.footer-credit::after { content: '♦'; color: var(--cyan); font-size: .5rem; }
+
+/* ═══════════════════════════════════════════════════
+   RESPONSIVE
+═══════════════════════════════════════════════════ */
+@media (max-width: 1100px) {
+  .about-grid { grid-template-columns: 1fr; gap: 50px; }
+  .about-visual { height: 350px; }
+  .skills3d-grid { grid-template-columns: repeat(4, 1fr); }
+  .tools-grid { grid-template-columns: repeat(3, 1fr); }
+  .port-grid { grid-template-columns: repeat(2, 1fr); }
+  .port-card.wide { grid-column: span 1; }
+  .port-card.wide .port-img { aspect-ratio: 4/3; }
+  .serv-grid { grid-template-columns: repeat(2, 1fr); }
+  .test-grid { grid-template-columns: repeat(2, 1fr); }
+  .modal-grid { grid-template-columns: 1fr; }
+  .modal-gallery { grid-template-columns: 1fr; }
+}
+@media (max-width: 768px) {
+  .nav-ul, .nav-hire { display: none; }
+  .ham-btn { display: flex; }
+  section { padding: 80px 5%; }
+  .skills3d-grid { grid-template-columns: repeat(3, 1fr); }
+  .tools-grid { grid-template-columns: repeat(2, 1fr); }
+  .port-grid { grid-template-columns: 1fr; }
+  .serv-grid { grid-template-columns: 1fr; }
+  .test-grid { grid-template-columns: 1fr; }
+  .contact-grid { grid-template-columns: 1fr; gap: 48px; }
+  .fgrow { grid-template-columns: 1fr; }
+  .footer-top { flex-direction: column; align-items: flex-start; }
+  .footer-bottom { flex-direction: column; text-align: center; }
+  .hero-stats-row { gap: 24px; }
+  .modal-gallery { grid-template-columns: 1fr; }
+}
+@media (max-width: 480px) {
+  .skills3d-grid { grid-template-columns: repeat(2, 1fr); }
+  .tools-grid { grid-template-columns: 1fr; }
+  .hero-btns { flex-direction: column; }
+  .btn-primary, .btn-secondary { justify-content: center; }
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════ CURSOR ═══════ -->
+<div id="cur-dot"></div>
+<div id="cur-ring"></div>
+<div id="mouse-glow"></div>
+
+<!-- ═══════ PARTICLE CANVAS ═══════ -->
+<canvas id="bg-canvas"></canvas>
+
+<!-- ═══════ CINEMATIC LOADER ═══════ -->
+<div id="loader">
+  <div class="ld-scanline"></div>
+  <div class="ld-logo-wrap">
+    <div class="ld-ring1"></div>
+    <div class="ld-ring2"></div>
+    <div class="ld-ring3"></div>
+    <div class="ld-text-logo">RS</div>
+  </div>
+  <div class="ld-progress-wrap">
+    <div class="ld-bar-bg"><div class="ld-bar-fill"></div></div>
+    <div class="ld-label">Rendering Experience…</div>
+  </div>
+</div>
+
+<!-- ═══════ NAVIGATION ═══════ -->
+<nav id="nav">
+  <a href="#hero" class="nav-logo">RAJESH.S</a>
+  <ul class="nav-ul">
+    <li><a href="#about">About</a></li>
+    <li><a href="#skills3d">Skills</a></li>
+    <li><a href="#tools">Tools</a></li>
+    <li><a href="#portfolio">Work</a></li>
+    <li><a href="#services">Services</a></li>
+    <li><a href="#testimonials">Reviews</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+  <a href="https://wa.me/919342609507" target="_blank" class="nav-hire">Hire Me →</a>
+  <button class="ham-btn" onclick="toggleMob()" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+<div class="mob-nav" id="mobNav">
+  <button class="mob-close" onclick="toggleMob()">✕ Close</button>
+  <a href="#about" onclick="toggleMob()">About</a>
+  <a href="#skills3d" onclick="toggleMob()">Skills</a>
+  <a href="#tools" onclick="toggleMob()">Tools</a>
+  <a href="#portfolio" onclick="toggleMob()">Work</a>
+  <a href="#services" onclick="toggleMob()">Services</a>
+  <a href="#testimonials" onclick="toggleMob()">Reviews</a>
+  <a href="#contact" onclick="toggleMob()">Contact</a>
+</div>
+
+<!-- ═══════════════════════════════════════
+     HERO SECTION
+═══════════════════════════════════════ -->
+<section id="hero">
+  <canvas id="hero-canvas"></canvas>
+  <div class="hero-grid-lines"></div>
+  <div class="hero-scanlines"></div>
+  <div class="hero-radials"></div>
+
+  <div class="hero-content reveal">
+    <div class="hero-badge">✦ Available for Freelance Projects</div>
+    <h1 class="hero-name">
+      <span class="hero-glitch" data-text="RAJESH">RAJESH</span><br>
+      <span style="opacity:.2">──────</span><br>
+      <span style="font-size:.5em; letter-spacing:.12em; opacity:.85">S</span>
+    </h1>
+    <div class="hero-sub">3D Modeling &amp; Visual Artist</div>
+    <p class="hero-desc">Crafting immersive 3D worlds, cinematic renders, and photorealistic visuals that push the boundaries of digital art. From hard-surface mechanical models to organic character sculpts — every polygon is intentional.</p>
+    <div class="hero-btns">
+      <a href="#portfolio" class="btn-primary">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        View Portfolio
+      </a>
+      <a href="#contact" class="btn-secondary">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        Contact Me
+      </a>
+    </div>
+    <div class="hero-stats-row">
+      <div class="hstat"><div class="hstat-num">5+</div><div class="hstat-lbl">Years Exp.</div></div>
+      <div class="hstat"><div class="hstat-num">150+</div><div class="hstat-lbl">3D Projects</div></div>
+      <div class="hstat"><div class="hstat-num">98%</div><div class="hstat-lbl">Client Sat.</div></div>
+      <div class="hstat"><div class="hstat-num">30+</div><div class="hstat-lbl">Awards</div></div>
+    </div>
+  </div>
+
+  <div class="scroll-ind">
+    <div class="scroll-dot"></div>
+    <span>Scroll</span>
+  </div>
+</section>
+
+<div class="sec-div"></div>
+
+<!-- ═══════════════════════════════════════
+     ABOUT SECTION
+═══════════════════════════════════════ -->
+<section id="about">
+  <div class="about-grid">
+
+    <div class="about-glass reveal">
+      <div class="about-photo-ring">
+        <img src="https://images.unsplash.com/photo-1607746882042-944635dfe10e?w=200&q=80" alt="Rajesh S">
+      </div>
+      <span class="sec-tag">About Me</span>
+      <h2 class="sec-title">Crafting Digital <span class="hl">Realities</span></h2>
+      <div class="exp-tags">
+        <span class="exp-tag">Blender Expert</span>
+        <span class="exp-tag">5+ Years Exp</span>
+        <span class="exp-tag">150+ Clients</span>
+      </div>
+      <p class="about-bio">I'm Rajesh S, a passionate 3D Modeling & Visual Artist based in India. I specialize in creating photorealistic renders, intricate character models, and stunning product visualizations that bridge the gap between imagination and reality.</p>
+      <p class="about-bio" style="margin-top: -8px;">With a deep focus on hard-surface mechanics, organic sculpting, and cinematic lighting, I bring technical precision and artistic vision to every project — transforming concepts into immersive visual experiences.</p>
+      <div class="skills-list" style="margin-top:28px;">
+        <div class="skill-item">
+          <div class="skill-head"><span class="skill-name">Hard Surface Modeling</span><span class="skill-pct">95%</span></div>
+          <div class="skill-bar"><div class="skill-fill sf1" data-w="95"></div></div>
+        </div>
+        <div class="skill-item">
+          <div class="skill-head"><span class="skill-name">Character Sculpting</span><span class="skill-pct">90%</span></div>
+          <div class="skill-bar"><div class="skill-fill sf2" data-w="90"></div></div>
+        </div>
+        <div class="skill-item">
+          <div class="skill-head"><span class="skill-name">Texturing & Shading</span><span class="skill-pct">92%</span></div>
+          <div class="skill-bar"><div class="skill-fill sf3" data-w="92"></div></div>
+        </div>
+        <div class="skill-item">
+          <div class="skill-head"><span class="skill-name">Cinematic Lighting</span><span class="skill-pct">88%</span></div>
+          <div class="skill-bar"><div class="skill-fill sf4" data-w="88"></div></div>
+        </div>
+        <div class="skill-item">
+          <div class="skill-head"><span class="skill-name">VFX & Motion Graphics</span><span class="skill-pct">85%</span></div>
+          <div class="skill-bar"><div class="skill-fill sf5" data-w="85"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="about-visual reveal">
+      <div class="cube-glow"></div>
+      <div class="orb orb1"></div>
+      <div class="orb orb2"></div>
+      <div class="orb orb3"></div>
+      <div class="cube-scene">
+        <div class="cube-3d" id="aboutCube">
+          <div class="cube-face cf-f"></div>
+          <div class="cube-face cf-b"></div>
+          <div class="cube-face cf-l"></div>
+          <div class="cube-face cf-r"></div>
+          <div class="cube-face cf-t"></div>
+          <div class="cube-face cf-bo"></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<div class="sec-div"></div>
+
+<!-- ═══════════════════════════════════════
+     3D MODELING SKILLS
+═══════════════════════════════════════ -->
+<section id="skills3d">
+  <div class="sec-center reveal" style="max-width:600px;margin:0 auto 56px;">
+    <span class="sec-tag">Expertise</span>
+    <h2 class="sec-title">3D Modeling <span class="hl">Skills</span></h2>
+    <p class="sec-desc">A comprehensive toolkit of 3D art disciplines — from concept to final render.</p>
+  </div>
+  <div class="skills3d-grid reveal">
+    <div class="s3d-card"><div class="s3d-icon">⚙️</div><div class="s3d-name">Hard Surface<br>Modeling</div><div class="s3d-level"><div class="s3d-dot on"></div><div class="s3d-dot on"></div><div class="s3d-dot on"></div><div class="s3d-dot on"></div><div class="s3d-dot on"></div></div></div>
+    <div class="s3d-card"><div class="s3d-icon">🧬</div><div class="s3d-name">Character<br>Modeling</div><div class="s3d-level"><div class="s3d-dot on"></div><div class="s3d-dot on"></div><div class="s3d-dot on"></div><div class="s3d-dot on"></div><div class="s3d-dot"></div></div></div>
+    <div class="s3d-card"><div class="s3d-icon">📦</div><div class="s3d-name">Product<br>Visualization</div><div class="s3d-level"><div class="s3d-dot on"></div><div class="s3d-dot on"></div><div class="s3d-dot on"></div><div class="s3d-dot on"></div><div class="s3d-dot on"></div></div></div>
+    <div class="s3d-card"><div class="s3d-icon">🌍</div><div class="s3d-name">Environment<br>Design</div><div class="s3d-level"><div class="s3d-dot on"></div><div class="s3d-dot on"></div><div class="s3d-dot on"></div><div class="s3d-dot on"></div><div class="s3d-dot"></div></div></div>
+    <div class="s3d-card"><div class="s3d-icon">🗿</div><div class="s3d-name">Organic<br>Sculpting</div><div class="s3d-level"><div class="s3d-dot on"></div><div class="s3d-dot on"></div><div class="s3d-dot on"></div><div class="s3d-dot on"></div><div class="s3d-dot"></div></div></div>
+    <div class="s3d-card"><div class="s3d-icon">🎨</div><div class="s3d-name">Texturing &amp;<br>Shading</div><div class="s3d-level"><div class="s3d-dot on"></div><div class="s3d-dot on"></div><div class="s3d-dot on"></div><div class="s3d-dot on"></div><div class="s3d-dot on"></div></div></div>
+    <div class="s3d-card"><div class="s3d-icon">💡</div><div class="s3d-name">Cinematic<br>Lighting</div><div class="s3d-level"><div class="s3d-dot on"></div><div class="s3d-dot on"></div><div class="s3d-dot on"></div><div class="s3d-dot on"></div><div class="s3d-dot"></div></div></div>
+    <div class="s3d-card"><div class="s3d-icon">🖥️</div><div class="s3d-name">PBR<br>Rendering</div><div class="s3d-level"><div class="s3d-dot on"></div><div class="s3d-dot on"></div><div class="s3d-dot on"></div><div class="s3d-dot on"></div><div class="s3d-dot on"></div></div></div>
+    <div class="s3d-card"><div class="s3d-icon">🎬</div><div class="s3d-name">3D<br>Animation</div><div class="s3d-level"><div class="s3d-dot on"></div><div class="s3d-dot on"></div><div class="s3d-dot on"></div><div class="s3d-dot"></div><div class="s3d-dot"></div></div></div>
+    <div class="s3d-card"><div class="s3d-icon">✨</div><div class="s3d-name">VFX<br>Simulation</div><div class="s3d-level"><div class="s3d-dot on"></div><div class="s3d-dot on"></div><div class="s3d-dot on"></div><div class="s3d-dot on"></div><div class="s3d-dot"></div></div></div>
+    <div class="s3d-card"><div class="s3d-icon">🌀</div><div class="s3d-name">Motion<br>Graphics</div><div class="s3d-level"><div class="s3d-dot on"></div><div class="s3d-dot on"></div><div class="s3d-dot on"></div><div class="s3d-dot on"></div><div class="s3d-dot"></div></div></div>
+    <div class="s3d-card"><div class="s3d-icon">🎮</div><div class="s3d-name">Game<br>Assets</div><div class="s3d-level"><div class="s3d-dot on"></div><div class="s3d-dot on"></div><div class="s3d-dot on"></div><div class="s3d-dot on"></div><div class="s3d-dot"></div></div></div>
+  </div>
+</section>
+
+<div class="sec-div"></div>
+
+<!-- ═══════════════════════════════════════
+     TOOLS SECTION
+═══════════════════════════════════════ -->
+<section id="tools">
+  <div class="sec-center reveal" style="max-width:600px;margin:0 auto 56px;">
+    <span class="sec-tag">Software Arsenal</span>
+    <h2 class="sec-title">Tools I <span class="hl">Master</span></h2>
+    <p class="sec-desc">Industry-standard software stack for creating next-level 3D art and animations.</p>
+  </div>
+  <div class="tools-grid reveal">
+    <a href="https://www.blender.org" target="_blank" rel="noopener" class="tool-card tg1">
+      <div class="tool-link">↗</div>
+      <div class="tool-icon-wrap" style="background:linear-gradient(135deg,rgba(249,122,0,.15),rgba(255,175,0,.08));border-color:rgba(249,122,0,.3);">
+        <span class="tool-icon">🔶</span>
+      </div>
+      <div class="tool-name">Blender</div>
+      <div class="tool-tag">3D Modeling & Rendering</div>
+    </a>
+    <a href="https://www.autodesk.com/products/maya" target="_blank" rel="noopener" class="tool-card tg2">
+      <div class="tool-link">↗</div>
+      <div class="tool-icon-wrap" style="background:linear-gradient(135deg,rgba(0,175,225,.15),rgba(0,200,200,.08));border-color:rgba(0,175,225,.3);">
+        <span class="tool-icon">🎯</span>
+      </div>
+      <div class="tool-name">Maya</div>
+      <div class="tool-tag">Animation & Rigging</div>
+    </a>
+    <a href="https://www.maxon.net" target="_blank" rel="noopener" class="tool-card tg3">
+      <div class="tool-link">↗</div>
+      <div class="tool-icon-wrap" style="background:linear-gradient(135deg,rgba(220,60,60,.15),rgba(200,40,40,.08));border-color:rgba(220,60,60,.3);">
+        <span class="tool-icon">🔴</span>
+      </div>
+      <div class="tool-name">Cinema 4D</div>
+      <div class="tool-tag">Motion Graphics</div>
+    </a>
+    <a href="https://pixologic.com" target="_blank" rel="noopener" class="tool-card tg4">
+      <div class="tool-link">↗</div>
+      <div class="tool-icon-wrap" style="background:linear-gradient(135deg,rgba(90,40,200,.15),rgba(120,60,220,.08));border-color:rgba(90,40,200,.3);">
+        <span class="tool-icon">🗿</span>
+      </div>
+      <div class="tool-name">ZBrush</div>
+      <div class="tool-tag">Digital Sculpting</div>
+    </a>
+    <a href="https://www.substance3d.com" target="_blank" rel="noopener" class="tool-card tg5">
+      <div class="tool-link">↗</div>
+      <div class="tool-icon-wrap" style="background:linear-gradient(135deg,rgba(0,200,100,.15),rgba(0,245,180,.08));border-color:rgba(0,200,100,.3);">
+        <span class="tool-icon">🎨</span>
+      </div>
+      <div class="tool-name">Substance<br>Painter</div>
+      <div class="tool-tag">Texturing & PBR</div>
+    </a>
+    <a href="https://www.unrealengine.com" target="_blank" rel="noopener" class="tool-card tg6">
+      <div class="tool-link">↗</div>
+      <div class="tool-icon-wrap" style="background:linear-gradient(135deg,rgba(60,80,250,.15),rgba(30,60,200,.08));border-color:rgba(60,80,250,.3);">
+        <span class="tool-icon">🎮</span>
+      </div>
+      <div class="tool-name">Unreal Engine</div>
+      <div class="tool-tag">Real-time Rendering</div>
+    </a>
+    <a href="https://www.adobe.com/products/aftereffects.html" target="_blank" rel="noopener" class="tool-card tg7">
+      <div class="tool-link">↗</div>
+      <div class="tool-icon-wrap" style="background:linear-gradient(135deg,rgba(148,0,211,.15),rgba(100,0,180,.08));border-color:rgba(148,0,211,.3);">
+        <span class="tool-icon">✨</span>
+      </div>
+      <div class="tool-name">After Effects</div>
+      <div class="tool-tag">VFX & Compositing</div>
+    </a>
+    <a href="https://www.adobe.com/products/photoshop.html" target="_blank" rel="noopener" class="tool-card tg8">
+      <div class="tool-link">↗</div>
+      <div class="tool-icon-wrap" style="background:linear-gradient(135deg,rgba(0,100,200,.15),rgba(0,80,180,.08));border-color:rgba(0,100,200,.3);">
+        <span class="tool-icon">🖌️</span>
+      </div>
+      <div class="tool-name">Photoshop</div>
+      <div class="tool-tag">Post-Processing</div>
+    </a>
+  </div>
+</section>
+
+<div class="sec-div"></div>
+
+<!-- ═══════════════════════════════════════
+     PORTFOLIO SECTION
+═══════════════════════════════════════ -->
+<section id="portfolio">
+  <div class="sec-center reveal" style="max-width:600px;margin:0 auto 28px;">
+    <span class="sec-tag">Portfolio</span>
+    <h2 class="sec-title">Selected <span class="hl">Works</span></h2>
+    <p class="sec-desc">Photorealistic renders, cinematic scenes, and precision-crafted 3D models.</p>
+  </div>
+  <div class="port-filters reveal">
+    <button class="pf-btn active" data-filter="all">All Work</button>
+    <button class="pf-btn" data-filter="product">Product Renders</button>
+    <button class="pf-btn" data-filter="character">Character</button>
+    <button class="pf-btn" data-filter="vehicle">Vehicle</button>
+    <button class="pf-btn" data-filter="scifi">Sci-Fi</button>
+    <button class="pf-btn" data-filter="environment">Environment</button>
+    <button class="pf-btn" data-filter="nft">NFT Art</button>
+    <button class="pf-btn" data-filter="motion">Motion</button>
+  </div>
+  <div class="port-grid reveal">
+
+    <div class="port-card wide" data-cat="product" onclick="openModal(0)">
+      <div class="port-img"><img src="https://images.unsplash.com/photo-1617791160588-241658ad1b7e?w=900&q=80" alt="Product Render" loading="lazy"></div>
+      <div class="port-overlay">
+        <div class="port-ov-cat">Product Visualization</div>
+        <div class="port-ov-title">Hyper-Realistic Product Renders</div>
+        <div class="port-ov-btn">View Project →</div>
+      </div>
+      <div class="port-info"><div class="port-cat">Product Renders</div><div class="port-title">Luxury Brand Visualization Suite</div></div>
+    </div>
+
+    <div class="port-card" data-cat="character" onclick="openModal(1)">
+      <div class="port-img"><img src="https://images.unsplash.com/photo-1608889335941-32ac5f2041b9?w=600&q=80" alt="Character Model" loading="lazy"></div>
+      <div class="port-overlay">
+        <div class="port-ov-cat">Character Modeling</div>
+        <div class="port-ov-title">Sci-Fi Warrior Character</div>
+        <div class="port-ov-btn">View Project →</div>
+      </div>
+      <div class="port-info"><div class="port-cat">Character Models</div><div class="port-title">NEXUS-7 Warrior — Game Ready Character</div></div>
+    </div>
+
+    <div class="port-card" data-cat="vehicle" onclick="openModal(2)">
+      <div class="port-img"><img src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=80" alt="Vehicle Model" loading="lazy"></div>
+      <div class="port-overlay">
+        <div class="port-ov-cat">Vehicle Modeling</div>
+        <div class="port-ov-title">Concept Hypercar 3D Model</div>
+        <div class="port-ov-btn">View Project →</div>
+      </div>
+      <div class="port-info"><div class="port-cat">Vehicle Models</div><div class="port-title">Aurora GT — Photorealistic Hypercar</div></div>
+    </div>
+
+    <div class="port-card" data-cat="scifi" onclick="openModal(3)">
+      <div class="port-img"><img src="https://images.unsplash.com/photo-1614728263952-84ea256f9679?w=600&q=80" alt="Sci-Fi Asset" loading="lazy"></div>
+      <div class="port-overlay">
+        <div class="port-ov-cat">Sci-Fi Assets</div>
+        <div class="port-ov-title">Orbital Space Station</div>
+        <div class="port-ov-btn">View Project →</div>
+      </div>
+      <div class="port-info"><div class="port-cat">Sci-Fi Assets</div><div class="port-title">Deep Space Station — Omega Ring</div></div>
+    </div>
+
+    <div class="port-card wide" data-cat="environment" onclick="openModal(4)">
+      <div class="port-img"><img src="https://images.unsplash.com/photo-1622737133809-d95047b9e673?w=900&q=80" alt="Environment Design" loading="lazy"></div>
+      <div class="port-overlay">
+        <div class="port-ov-cat">Environment Design</div>
+        <div class="port-ov-title">Cyberpunk Mega-City Environment</div>
+        <div class="port-ov-btn">View Project →</div>
+      </div>
+      <div class="port-info"><div class="port-cat">Environment Design</div><div class="port-title">Neo-Tokyo 2099 — Cinematic City</div></div>
+    </div>
+
+    <div class="port-card" data-cat="nft" onclick="openModal(5)">
+      <div class="port-img"><img src="https://images.unsplash.com/photo-1634193295627-1cdddf751ebf?w=600&q=80" alt="NFT Art" loading="lazy"></div>
+      <div class="port-overlay">
+        <div class="port-ov-cat">NFT Art</div>
+        <div class="port-ov-title">Generative 3D NFT Collection</div>
+        <div class="port-ov-btn">View Project →</div>
+      </div>
+      <div class="port-info"><div class="port-cat">NFT Art</div><div class="port-title">PHANTOM FORMS — 500 Piece Collection</div></div>
+    </div>
+
+    <div class="port-card" data-cat="motion" onclick="openModal(6)">
+      <div class="port-img"><img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=600&q=80" alt="Motion Graphics" loading="lazy"></div>
+      <div class="port-overlay">
+        <div class="port-ov-cat">Motion Graphics</div>
+        <div class="port-ov-title">Cinematic Brand Opener</div>
+        <div class="port-ov-btn">View Project →</div>
+      </div>
+      <div class="port-info"><div class="port-cat">Motion Graphics</div><div class="port-title">VOLT Corp — Cinematic Brand Reveal</div></div>
+    </div>
+
+  </div>
+</section>
+
+<!-- PROJECT DETAIL MODAL -->
+<div id="project-modal">
+  <button class="modal-close-btn" onclick="closeModal()">✕ Close</button>
+  <div class="modal-inner" id="modal-content">
+    <!-- Filled dynamically -->
+  </div>
+</div>
+
+<div class="sec-div"></div>
+
+<!-- ═══════════════════════════════════════
+     SERVICES SECTION
+═══════════════════════════════════════ -->
+<section id="services">
+  <div class="sec-center reveal" style="max-width:600px;margin:0 auto 56px;">
+    <span class="sec-tag">Services</span>
+    <h2 class="sec-title">What I <span class="hl">Offer</span></h2>
+    <p class="sec-desc">End-to-end 3D creative services — from concept and modeling to final cinematic delivery.</p>
+  </div>
+  <div class="serv-grid reveal">
+
+    <div class="serv-card">
+      <div class="serv-icon-wrap">📦</div>
+      <div class="serv-name">3D Product Rendering</div>
+      <p class="serv-desc">Photorealistic product visualizations that make your products shine — ecommerce, advertising, and packaging.</p>
+      <ul class="serv-features">
+        <li>360° Product Turntable</li>
+        <li>Studio & Lifestyle Renders</li>
+        <li>Exploded View Assembly</li>
+        <li>Up to 8K Resolution</li>
+      </ul>
+      <div class="serv-price">Starting ₹4,999</div>
+      <a href="#contact" class="serv-cta">Get a Quote →</a>
+    </div>
+
+    <div class="serv-card">
+      <div class="serv-icon-wrap">🧬</div>
+      <div class="serv-name">Character Modeling</div>
+      <p class="serv-desc">High-fidelity character models for games, films, and animation with full rigging and PBR textures.</p>
+      <ul class="serv-features">
+        <li>High-Poly Sculpt + Retopo</li>
+        <li>Full PBR Material Setup</li>
+        <li>Rigged & Game-Ready</li>
+        <li>LOD Variants Included</li>
+      </ul>
+      <div class="serv-price">Starting ₹8,999</div>
+      <a href="#contact" class="serv-cta">Get a Quote →</a>
+    </div>
+
+    <div class="serv-card featured">
+      <div class="feat-badge">Most Popular</div>
+      <div class="serv-icon-wrap" style="border-color:var(--cyan);background:rgba(0,245,255,.1);">🎮</div>
+      <div class="serv-name">Game Asset Creation</div>
+      <p class="serv-desc">Complete game-ready asset pipelines — props, environments, weapons, and characters optimized for real-time engines.</p>
+      <ul class="serv-features">
+        <li>PBR Texturing (4K)</li>
+        <li>Unreal/Unity Compatible</li>
+        <li>LOD & Collision Setup</li>
+        <li>Modular Asset Packs</li>
+        <li>Technical Art Support</li>
+      </ul>
+      <div class="serv-price">Starting ₹6,999</div>
+      <a href="#contact" class="serv-cta" style="background:rgba(0,245,255,.1);">Get a Quote →</a>
+    </div>
+
+    <div class="serv-card">
+      <div class="serv-icon-wrap">🔮</div>
+      <div class="serv-name">NFT 3D Art</div>
+      <p class="serv-desc">Generative and one-of-one 3D NFT art collections with cinematic renders and unique procedural designs.</p>
+      <ul class="serv-features">
+        <li>Custom 3D Character Design</li>
+        <li>Trait Variation System</li>
+        <li>Animated Versions</li>
+        <li>Minting-Ready Files</li>
+      </ul>
+      <div class="serv-price">Starting ₹12,999</div>
+      <a href="#contact" class="serv-cta">Get a Quote →</a>
+    </div>
+
+    <div class="serv-card">
+      <div class="serv-icon-wrap">🌀</div>
+      <div class="serv-name">Motion Graphics</div>
+      <p class="serv-desc">Cinematic 3D motion graphics for brand reveals, logo animations, product launches, and broadcast packages.</p>
+      <ul class="serv-features">
+        <li>Logo Reveal Animations</li>
+        <li>3D Title Sequences</li>
+        <li>Product Showcase Videos</li>
+        <li>Social Media Reels</li>
+      </ul>
+      <div class="serv-price">Starting ₹5,999</div>
+      <a href="#contact" class="serv-cta">Get a Quote →</a>
+    </div>
+
+    <div class="serv-card">
+      <div class="serv-icon-wrap">✨</div>
+      <div class="serv-name">VFX & Simulation</div>
+      <p class="serv-desc">Destruction sims, particle systems, fluid dynamics, and compositing for film-quality visual effects.</p>
+      <ul class="serv-features">
+        <li>Fluid & Smoke Sims</li>
+        <li>Destruction FX</li>
+        <li>Particle Systems</li>
+        <li>Green Screen Compositing</li>
+      </ul>
+      <div class="serv-price">Starting ₹9,999</div>
+      <a href="#contact" class="serv-cta">Get a Quote →</a>
+    </div>
+
+    <div class="serv-card">
+      <div class="serv-icon-wrap">🌍</div>
+      <div class="serv-name">3D Animation</div>
+      <p class="serv-desc">Full 3D animation production from storyboard to final render — characters, product demos, and explainers.</p>
+      <ul class="serv-features">
+        <li>Character Animation</li>
+        <li>Product Demo Animations</li>
+        <li>Architectural Walkthroughs</li>
+        <li>Cinematic Sequences</li>
+      </ul>
+      <div class="serv-price">Starting ₹14,999</div>
+      <a href="#contact" class="serv-cta">Get a Quote →</a>
+    </div>
+
+  </div>
+</section>
+
+<div class="sec-div"></div>
+
+<!-- ═══════════════════════════════════════
+     TESTIMONIALS
+═══════════════════════════════════════ -->
+<section id="testimonials">
+  <div class="sec-center reveal" style="max-width:560px;margin:0 auto 56px;">
+    <span class="sec-tag">Client Reviews</span>
+    <h2 class="sec-title">What Clients <span class="hl">Say</span></h2>
+  </div>
+  <div class="test-grid reveal">
+    <div class="test-card">
+      <div class="test-stars">★★★★★</div>
+      <p class="test-text">Rajesh transformed our product line with stunning 3D renders that literally doubled our conversion rate. The attention to material detail and lighting was on another level — clients thought the renders were actual photos.</p>
+      <div class="test-author">
+        <div class="test-avatar"><img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=80&q=80" alt="Priya"></div>
+        <div><div class="test-name">Priya Krishnan</div><div class="test-role">Creative Director, Luminary Brands</div></div>
+      </div>
+    </div>
+    <div class="test-card">
+      <div class="test-stars">★★★★★</div>
+      <p class="test-text">The game asset pack Rajesh delivered was impeccable — perfectly optimized, beautifully textured, and fully Unreal-ready. He understood our art direction immediately and exceeded every expectation.</p>
+      <div class="test-author">
+        <div class="test-avatar"><img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80&q=80" alt="Arjun"></div>
+        <div><div class="test-name">Arjun Mehta</div><div class="test-role">Lead Dev, HorizonPlay Studios</div></div>
+      </div>
+    </div>
+    <div class="test-card">
+      <div class="test-stars">★★★★★</div>
+      <p class="test-text">Our NFT collection sold out in 48 hours — Rajesh's 3D character designs were unlike anything in the space. Unique, cinematic quality, and delivered ahead of schedule. An absolute powerhouse talent.</p>
+      <div class="test-author">
+        <div class="test-avatar"><img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=80&q=80" alt="Maya"></div>
+        <div><div class="test-name">Maya Chen</div><div class="test-role">Founder, Neon Genesis NFT</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="sec-div"></div>
+
+<!-- ═══════════════════════════════════════
+     CONTACT SECTION
+═══════════════════════════════════════ -->
+<section id="contact">
+  <div class="contact-grid reveal">
+    <div>
+      <span class="sec-tag">Get In Touch</span>
+      <h2 class="sec-title">Let's Build Something <span class="hl">Epic</span></h2>
+      <p class="contact-tagline">Have a 3D project in mind? I'd love to hear about it. Drop me a message and I'll respond within 24 hours.</p>
+      <div class="contact-info">
+        <a href="mailto:hello@rajesh.design" class="c-item">
+          <div class="c-ico">✉️</div>
+          <div><div class="c-lbl">Email</div><div class="c-val">designs.tech7@gmail.com</div></div>
+        </a>
+        <a href="https://wa.me/919342609507" target="_blank" rel="noopener" class="c-item">
+          <div class="c-ico">📱</div>
+          <div><div class="c-lbl">Phone / WhatsApp</div><div class="c-val">+91 93426 09507</div></div>
+        </a>
+        <a href="https://instagram.com/deesigns.tech7" target="_blank" rel="noopener" class="c-item">
+          <div class="c-ico">📸</div>
+          <div><div class="c-lbl">Instagram</div><div class="c-val">@designs.tech7</div></div>
+        </a>
+        <a href="https://wa.me/919342609507" target="_blank" rel="noopener" class="wa-btn">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+          Chat on WhatsApp
+        </a>
+      </div>
+    </div>
+    <form class="c-form" id="contactForm" onsubmit="handleForm(event)">
+      <div class="fgrow">
+        <div class="fg"><label>First Name</label><input type="text" name="first_name" placeholder="Arjun" required></div>
+        <div class="fg"><label>Last Name</label><input type="text" name="last_name" placeholder="Mehta"></div>
+      </div>
+      <div class="fg"><label>Email Address</label><input type="email" name="email" placeholder="you@studio.com" required></div>
+      <div class="fg">
+        <label>Service Needed</label>
+        <select name="service">
+          <option value="">Select a service…</option>
+          <option>3D Product Rendering</option>
+          <option>Character Modeling</option>
+          <option>Game Asset Creation</option>
+          <option>NFT 3D Art</option>
+          <option>Motion Graphics</option>
+          <option>VFX &amp; Simulation</option>
+          <option>3D Animation</option>
+          <option>Custom Project</option>
+        </select>
+      </div>
+      <div class="fg"><label>Budget Range</label>
+        <select name="budget">
+          <option value="">Select budget…</option>
+          <option>Under ₹5,000</option>
+          <option>₹5,000 – ₹15,000</option>
+          <option>₹15,000 – ₹50,000</option>
+          <option>₹50,000+</option>
+        </select>
+      </div>
+      <div class="fg"><label>Project Brief</label><textarea rows="5" name="message" placeholder="Describe your 3D project — style references, deadline, deliverables…" required></textarea></div>
+      <button type="submit" class="form-submit" id="submitBtn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+
+        Send Message
+    
+      </button>
+    </form>
+  </div>
+</section>
+
+<!-- ═══════ FOOTER ═══════ -->
+<footer>
+  <div class="footer-top">
+    <div>
+      <div class="footer-logo-txt">RAJESH.S</div>
+      <div class="footer-tagline">3D Modeling & Visual Artist</div>
+    </div>
+    <div class="footer-nav-links">
+      <a href="#about">About</a>
+      <a href="#skills3d">Skills</a>
+      <a href="#portfolio">Work</a>
+      <a href="#services">Services</a>
+      <a href="#contact">Contact</a>
+    </div>
+    <div class="footer-socials">
+      <a href="https://instagram.com/rajesh.designs" target="_blank" class="fsoc-btn" title="Instagram">📸</a>
+      <a href="#" class="fsoc-btn" title="Behance">🎨</a>
+      <a href="#" class="fsoc-btn" title="ArtStation">🖌️</a>
+      <a href="#" class="fsoc-btn" title="LinkedIn">💼</a>
+      <a href="https://wa.me/919342609507" target="_blank" class="fsoc-btn" title="WhatsApp">💬</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <div class="footer-copy">© 2026 RAJESH S — ALL RIGHTS RESERVED</div>
+    <div class="footer-credit">CRAFTED WITH PASSION &amp; PRECISION</div>
+  </div>
+</footer>
+
+<!-- ═══════════════════════════════════════
+     JAVASCRIPT
+═══════════════════════════════════════ -->
+<script>
+/* ─── CURSOR ─── */
+const dot = document.getElementById('cur-dot');
+const ring = document.getElementById('cur-ring');
+const glow = document.getElementById('mouse-glow');
+let mx = 0, my = 0, rx = 0, ry = 0;
+
+document.addEventListener('mousemove', e => {
+  mx = e.clientX; my = e.clientY;
+  dot.style.left = mx + 'px'; dot.style.top = my + 'px';
+  glow.style.left = mx + 'px'; glow.style.top = my + 'px';
+});
+
+(function animRing() {
+  rx += (mx - rx) * .1; ry += (my - ry) * .1;
+  ring.style.left = rx + 'px'; ring.style.top = ry + 'px';
+  requestAnimationFrame(animRing);
+})();
+
+/* ─── PARTICLE BACKGROUND ─── */
+const bgC = document.getElementById('bg-canvas');
+const bgX = bgC.getContext('2d');
+let bW, bH, bParts = [];
+
+function resizeBg() { bW = bgC.width = innerWidth; bH = bgC.height = innerHeight; }
+resizeBg(); window.addEventListener('resize', resizeBg);
+
+function makeParts(n) {
+  bParts = [];
+  const cols = ['rgba(0,245,255,','rgba(139,0,255,','rgba(255,45,120,','rgba(0,71,255,'];
+  for (let i = 0; i < n; i++) {
+    bParts.push({
+      x: Math.random() * bW, y: Math.random() * bH,
+      vx: (Math.random() - .5) * .32, vy: (Math.random() - .5) * .32,
+      r: Math.random() * 1.4 + .2,
+      a: Math.random() * .45 + .08,
+      c: cols[Math.floor(Math.random() * cols.length)]
+    });
+  }
+}
+makeParts(110);
+
+function drawBg() {
+  bgX.clearRect(0, 0, bW, bH);
+  bParts.forEach((p, i) => {
+    p.x += p.vx; p.y += p.vy;
+    if (p.x < 0) p.x = bW; if (p.x > bW) p.x = 0;
+    if (p.y < 0) p.y = bH; if (p.y > bH) p.y = 0;
+    bgX.beginPath();
+    bgX.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+    bgX.fillStyle = p.c + p.a + ')';
+    bgX.fill();
+    for (let j = i + 1; j < bParts.length; j++) {
+      const dx = p.x - bParts[j].x, dy = p.y - bParts[j].y;
+      const d = Math.sqrt(dx*dx + dy*dy);
+      if (d < 95) {
+        bgX.beginPath();
+        bgX.moveTo(p.x, p.y); bgX.lineTo(bParts[j].x, bParts[j].y);
+        bgX.strokeStyle = `rgba(0,245,255,${(1 - d/95) * .055})`;
+        bgX.lineWidth = .35; bgX.stroke();
+      }
+    }
+  });
+  requestAnimationFrame(drawBg);
+}
+drawBg();
+
+/* ─── THREE.JS HERO 3D SCENE ─── */
+(function() {
+  const canvas = document.getElementById('hero-canvas');
+  if (!window.THREE || !canvas) return;
+
+  const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+  renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+  renderer.setSize(innerWidth, innerHeight);
+
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(60, innerWidth / innerHeight, .1, 100);
+  camera.position.set(0, 0, 5);
+
+  // Main torus knot (wireframe)
+  const torusGeo = new THREE.TorusKnotGeometry(1.4, .38, 160, 24, 2, 3);
+  const torusMat = new THREE.MeshBasicMaterial({
+    color: 0x00f5ff, wireframe: true, opacity: .18, transparent: true
+  });
+  const torus = new THREE.Mesh(torusGeo, torusMat);
+  torus.position.set(3.2, -.3, -1);
+  scene.add(torus);
+
+  // Second torus (solid, glowing)
+  const torus2Mat = new THREE.MeshPhongMaterial({
+    color: 0x00f5ff, emissive: 0x002244, opacity: .07, transparent: true
+  });
+  const torus2 = new THREE.Mesh(torusGeo, torus2Mat);
+  torus2.position.set(3.2, -.3, -1);
+  scene.add(torus2);
+
+  // Icosahedron
+  const icoGeo = new THREE.IcosahedronGeometry(.9, 1);
+  const icoMat = new THREE.MeshBasicMaterial({ color: 0x8b00ff, wireframe: true, opacity: .2, transparent: true });
+  const ico = new THREE.Mesh(icoGeo, icoMat);
+  ico.position.set(-3.5, 1, -2);
+  scene.add(ico);
+
+  // Floating particles
+  const partCount = 300;
+  const positions = new Float32Array(partCount * 3);
+  for (let i = 0; i < partCount * 3; i++) {
+    positions[i] = (Math.random() - .5) * 14;
+  }
+  const partGeo = new THREE.BufferGeometry();
+  partGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+  const partMat = new THREE.PointsMaterial({ color: 0x00f5ff, size: .04, transparent: true, opacity: .55 });
+  const points = new THREE.Points(partGeo, partMat);
+  scene.add(points);
+
+  // Pink particles
+  const pinkGeo = new THREE.BufferGeometry();
+  const pinkPos = new Float32Array(150 * 3);
+  for (let i = 0; i < 150 * 3; i++) pinkPos[i] = (Math.random() - .5) * 16;
+  pinkGeo.setAttribute('position', new THREE.BufferAttribute(pinkPos, 3));
+  const pinkMat = new THREE.PointsMaterial({ color: 0x8b00ff, size: .05, transparent: true, opacity: .35 });
+  scene.add(new THREE.Points(pinkGeo, pinkMat));
+
+  // Lights
+  const light1 = new THREE.PointLight(0x00f5ff, 2, 10);
+  light1.position.set(4, 2, 3);
+  scene.add(light1);
+  const light2 = new THREE.PointLight(0x8b00ff, 1.5, 10);
+  light2.position.set(-4, -2, 2);
+  scene.add(light2);
+  const ambient = new THREE.AmbientLight(0x111122, .5);
+  scene.add(ambient);
+
+  // Mouse
+  let mouseX = 0, mouseY = 0;
+  document.addEventListener('mousemove', e => {
+    mouseX = (e.clientX / innerWidth - .5) * 2;
+    mouseY = (e.clientY / innerHeight - .5) * 2;
+  });
+
+  window.addEventListener('resize', () => {
+    camera.aspect = innerWidth / innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(innerWidth, innerHeight);
+  });
+
+  let t = 0;
+  function animate() {
+    requestAnimationFrame(animate);
+    t += .008;
+    torus.rotation.x = t * .5; torus.rotation.y = t * .7;
+    torus2.rotation.x = t * .5; torus2.rotation.y = t * .7;
+    ico.rotation.x = t * .6; ico.rotation.y = t * .4; ico.rotation.z = t * .3;
+    points.rotation.y = t * .04; points.rotation.x = t * .02;
+    // Mouse parallax
+    camera.position.x += (mouseX * .8 - camera.position.x) * .04;
+    camera.position.y += (-mouseY * .5 - camera.position.y) * .04;
+    // Light follow mouse
+    light1.position.x = mouseX * 4 + 2;
+    light1.position.y = -mouseY * 3 + 1;
+    renderer.render(scene, camera);
+  }
+  animate();
+})();
+
+/* ─── LOADER ─── */
+window.addEventListener('load', () => {
+  setTimeout(() => document.getElementById('loader').classList.add('out'), 2800);
+});
+
+/* ─── NAV SCROLL ─── */
+window.addEventListener('scroll', () => {
+  document.getElementById('nav').classList.toggle('scrolled', scrollY > 50);
+});
+
+/* ─── MOBILE NAV ─── */
+function toggleMob() {
+  document.getElementById('mobNav').classList.toggle('open');
+}
+
+/* ─── SCROLL REVEAL ─── */
+const ro = new IntersectionObserver(entries => {
+  entries.forEach((e, i) => {
+    if (e.isIntersecting) {
+      setTimeout(() => {
+        e.target.classList.add('vis');
+        // Animate skill bars
+        e.target.querySelectorAll('.skill-fill').forEach(b => {
+          b.style.width = b.dataset.w + '%';
+        });
+      }, i * 80);
+      ro.unobserve(e.target);
+    }
+  });
+}, { threshold: .12 });
+document.querySelectorAll('.reveal').forEach(el => ro.observe(el));
+
+/* ─── 3D CARD TILT ─── */
+document.querySelectorAll('.port-card, .serv-card, .test-card, .s3d-card').forEach(c => {
+  c.addEventListener('mousemove', e => {
+    const r = c.getBoundingClientRect();
+    const x = ((e.clientX - r.left) / r.width - .5) * 18;
+    const y = ((e.clientY - r.top) / r.height - .5) * 18;
+    c.style.transform = `perspective(800px) rotateY(${x}deg) rotateX(${-y}deg) translateY(-6px) translateZ(12px)`;
+  });
+  c.addEventListener('mouseleave', () => { c.style.transform = ''; });
+});
+
+/* ─── ABOUT CUBE MOUSE PARALLAX ─── */
+const cube = document.getElementById('aboutCube');
+if (cube) {
+  document.addEventListener('mousemove', e => {
+    const x = (e.clientX / innerWidth - .5) * 30;
+    const y = (e.clientY / innerHeight - .5) * 20;
+    cube.style.animationPlayState = 'paused';
+    cube.style.transform = `rotateX(${20 - y}deg) rotateY(${-x}deg)`;
+  });
+}
+
+/* ─── PORTFOLIO FILTER ─── */
+document.querySelectorAll('.pf-btn').forEach(b => {
+  b.addEventListener('click', () => {
+    document.querySelectorAll('.pf-btn').forEach(x => x.classList.remove('active'));
+    b.classList.add('active');
+    const f = b.dataset.filter;
+    document.querySelectorAll('.port-card').forEach(c => {
+      if (f === 'all' || c.dataset.cat === f) {
+        c.style.display = ''; c.style.opacity = '0'; c.style.transform = 'translateY(20px)';
+        setTimeout(() => { c.style.transition = 'opacity .5s, transform .5s'; c.style.opacity = '1'; c.style.transform = ''; }, 50);
+      } else {
+        c.style.transition = 'opacity .3s'; c.style.opacity = '0';
+        setTimeout(() => { c.style.display = 'none'; }, 300);
+      }
+    });
+  });
+});
+
+/* ─── PROJECT MODAL DATA ─── */
+const projects = [
+  {
+    title: 'Luxury Brand Visualization Suite',
+    cat: 'Product Renders',
+    img: 'https://images.unsplash.com/photo-1617791160588-241658ad1b7e?w=900&q=80',
+    desc: 'A complete photorealistic product visualization suite for a luxury perfume brand. Shot entirely in Blender with HDRI lighting and custom PBR materials that are indistinguishable from real photography.',
+    tools: ['Blender', 'Substance Painter', 'Photoshop', 'ACES Color Space'],
+    process: [
+      { n: '01', title: 'Concept & Reference', text: 'Gathered reference boards, product specs, and shot lists. Discussed visual language and brand positioning with the client team.' },
+      { n: '02', title: 'Modeling & Shading', text: 'Created high-precision NURBS-like topology for the bottle geometry. Built custom procedural glass and liquid shaders.' },
+      { n: '03', title: 'Lighting & Rendering', text: 'Set up a 3-point HDRI studio with chromatic accent lights. Rendered in Cycles at 4K with 2048 samples.' },
+      { n: '04', title: 'Compositing & Delivery', text: 'Post-processed in Photoshop with color grading, depth-of-field refinement, and surface imperfection overlays.' }
+    ],
+    feedback: 'The renders were absolutely indistinguishable from photography. Our clients couldn\'t believe they were CGI. ROI on this project was extraordinary.',
+    client: '— Sarah Kim, Creative Director at Luminary',
+    gallery: [
+      'https://images.unsplash.com/photo-1519699047748-de8e457a634e?w=600&q=80',
+      'https://images.unsplash.com/photo-1576426863848-c21f53c60b19?w=600&q=80'
+    ]
+  },
+  {
+    title: 'NEXUS-7 Warrior — Game Ready Character',
+    cat: 'Character Models',
+    img: 'https://images.unsplash.com/photo-1608889335941-32ac5f2041b9?w=900&q=80',
+    desc: 'A fully game-ready sci-fi warrior character with 4K PBR textures, 58k poly count (high-res), and a clean 12k retopologized mesh with full rig and blend shapes for facial animation.',
+    tools: ['ZBrush', 'Blender', 'Substance Painter', 'Unreal Engine 5'],
+    process: [
+      { n: '01', title: 'Concept & Silhouette', text: 'Developed character design from concept art, focusing on strong silhouette and mechanical design language.' },
+      { n: '02', title: 'High-Poly Sculpt', text: 'Sculpted full high-poly in ZBrush — anatomy, armor detail, surface micro-detail and secondary forms.' },
+      { n: '03', title: 'Retopology & UVs', text: 'Rebuilt clean game-ready topology in Blender. Created 4-tile UV layout for maximum texture resolution.' },
+      { n: '04', title: 'Texturing & Rigging', text: 'Textured with Substance Painter (albedo, metallic, roughness, normal). Full skeleton rig with UE5 mannequin compatibility.' }
+    ],
+    feedback: 'The character fit perfectly into our UE5 project on first import. Art quality is AAA standard. Zero rework needed.',
+    client: '— Alex Rivera, Lead Artist at HorizonPlay Studios',
+    gallery: [
+      'https://images.unsplash.com/photo-1605296867424-35fc25c9212a?w=600&q=80',
+      'https://images.unsplash.com/photo-1603481588273-2f908a9a7a1b?w=600&q=80'
+    ]
+  },
+  {
+    title: 'Aurora GT — Photorealistic Hypercar',
+    cat: 'Vehicle Models',
+    img: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=900&q=80',
+    desc: 'A concept hypercar 3D model built for a design studio pitch — photorealistic exterior with accurate panel gaps, chrome trim, and dynamic studio lighting setup.',
+    tools: ['Blender', 'Substance Painter', 'Photoshop', 'KeyShot'],
+    process: [
+      { n: '01', title: 'Blueprint & Proportions', text: 'Modeled from engineering blueprints with accurate proportions. Used blueprint overlay method in Blender.' },
+      { n: '02', title: 'Body Modeling', text: 'Built clean subdivision-ready body mesh with proper edge flow for perfect reflections.' },
+      { n: '03', title: 'Materials & Lighting', text: 'Custom car paint shader with clearcoat, metallic flakes, and subsurface. Studio HDRI lighting.' },
+      { n: '04', title: 'Presentation Renders', text: 'Created beauty, 3/4, and detail shots. Wire overlay and clay renders for technical showcase.' }
+    ],
+    feedback: 'This is the best automotive 3D work we\'ve commissioned. The reflection quality is extraordinary — you can see the studio in the paint.',
+    client: '— James Park, Design Director at Aether Auto',
+    gallery: [
+      'https://images.unsplash.com/photo-1542362567-b07e54358753?w=600&q=80',
+      'https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=600&q=80'
+    ]
+  },
+  {
+    title: 'Deep Space Station — Omega Ring',
+    cat: 'Sci-Fi Assets',
+    img: 'https://images.unsplash.com/photo-1614728263952-84ea256f9679?w=900&q=80',
+    desc: 'A massive sci-fi space station asset for a feature film production. Includes full interior modular sections, exterior detail hull, navigation lights, and damage variants.',
+    tools: ['Blender', 'Substance Painter', 'Houdini', 'Nuke'],
+    process: [
+      { n: '01', title: 'Design & Lore', text: 'Collaborated with production designer to create a visual language consistent with the film\'s universe.' },
+      { n: '02', title: 'Modular Build', text: 'Built fully modular hull sections, allowing film crew to assemble different configurations.' },
+      { n: '03', title: 'Detail Passes', text: 'Added panel lines, weld seams, and utility details at 4 levels of detail.' },
+      { n: '04', title: 'VFX Integration', text: 'Delivered EXR render passes for compositing in Nuke. Created damage and aging variations.' }
+    ],
+    feedback: 'Rajesh\'s station is front and center in three key scenes. The directors were blown away by the detail level. We\'ll hire him for the sequel.',
+    client: '— Tom Wright, VFX Supervisor',
+    gallery: [
+      'https://images.unsplash.com/photo-1446776877081-d282a0f896e2?w=600&q=80',
+      'https://images.unsplash.com/photo-1454789548928-9efd52dc4031?w=600&q=80'
+    ]
+  },
+  {
+    title: 'Neo-Tokyo 2099 — Cinematic City',
+    cat: 'Environment Design',
+    img: 'https://images.unsplash.com/photo-1622737133809-d95047b9e673?w=900&q=80',
+    desc: 'A full cinematic cyberpunk city environment — 3 square kilometers of detailed urban landscape with neon signage, holographic billboards, and atmospheric volumetric lighting.',
+    tools: ['Blender', 'Unreal Engine 5', 'Substance Designer', 'After Effects'],
+    process: [
+      { n: '01', title: 'World Building', text: 'Created a detailed city map with district themes, traffic flow, and visual hierarchy.' },
+      { n: '02', title: 'Architecture Modeling', text: 'Built 300+ unique building assets with LOD variants. Used procedural Blender tools for detail variation.' },
+      { n: '03', title: 'Materials & Atmosphere', text: 'Custom wet concrete, neon glass, and hologram materials. Volumetric fog and rain particle system.' },
+      { n: '04', title: 'Cinematic Renders', text: 'Animated cinematic flythrough in UE5 using Sequencer. Delivered 4K video and stills.' }
+    ],
+    feedback: 'This environment is stunning. We used it as the primary setting for our entire campaign and the response from audiences has been overwhelming.',
+    client: '— Yuki Tanaka, Creative Lead at Neon Fiction',
+    gallery: [
+      'https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=600&q=80',
+      'https://images.unsplash.com/photo-1519501025264-65ba15a82390?w=600&q=80'
+    ]
+  },
+  {
+    title: 'PHANTOM FORMS — 500 Piece NFT Collection',
+    cat: 'NFT Art',
+    img: 'https://images.unsplash.com/photo-1634193295627-1cdddf751ebf?w=900&q=80',
+    desc: 'A generative 3D NFT collection of 500 unique phantom beings — each with procedurally generated traits, materials, and cinematic lighting. Sold out in 48 hours.',
+    tools: ['Blender', 'Python', 'Geometry Nodes', 'Photoshop'],
+    process: [
+      { n: '01', title: 'Base Character Design', text: 'Designed 5 base character archetypes with modular accessory slots and material parameters.' },
+      { n: '02', title: 'Trait Generation System', text: 'Built a Python + Geometry Nodes pipeline to procedurally generate 500 unique variants.' },
+      { n: '03', title: 'Batch Rendering', text: 'Set up automated render farm pipeline. Each piece rendered at 4K with custom per-trait lighting.' },
+      { n: '04', title: 'Metadata & Delivery', text: 'Generated JSON metadata with rarity scores. Delivered collection ready for OpenSea.' }
+    ],
+    feedback: 'Sold out in 48 hours. The community absolutely loved the cinematic quality — far beyond anything else in that price tier.',
+    client: '— @phantomcollector, NFT Project Lead',
+    gallery: [
+      'https://images.unsplash.com/photo-1626544827763-d516dce335e2?w=600&q=80',
+      'https://images.unsplash.com/photo-1620321023374-d1a68fbc720d?w=600&q=80'
+    ]
+  },
+  {
+    title: 'VOLT Corp — Cinematic Brand Reveal',
+    cat: 'Motion Graphics',
+    img: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=900&q=80',
+    desc: 'A 60-second cinematic brand reveal for a tech startup — featuring 3D logo construction, particle disintegration, neon light trails, and a dramatic product reveal sequence.',
+    tools: ['Cinema 4D', 'After Effects', 'Trapcode Particular', 'Octane Render'],
+    process: [
+      { n: '01', title: 'Storyboard & Timing', text: 'Developed 16-panel storyboard with precise timing charts. Synced to original soundtrack composition.' },
+      { n: '02', title: '3D Logo Construction', text: 'Built and animated the logo assembly sequence in Cinema 4D with procedural motion.' },
+      { n: '03', title: 'Particle System', text: 'Created custom Trapcode Particular preset for the energy particle system throughout the piece.' },
+      { n: '04', title: 'Compositing & Grade', text: 'Composited all passes in After Effects. Applied a filmic color grade with lens flares and chromatic aberration.' }
+    ],
+    feedback: 'This video got 2.3M views on launch day. It perfectly captured our brand vision and completely blew away our investors at the pitch.',
+    client: '— Ravi Chandrasekhar, CEO at VOLT Corp',
+    gallery: [
+      'https://images.unsplash.com/photo-1597662622614-e9f0a8a7bec0?w=600&q=80',
+      'https://images.unsplash.com/photo-1604871000636-074fa5117945?w=600&q=80'
+    ]
+  }
+];
+
+function openModal(idx) {
+  const p = projects[idx];
+  const content = document.getElementById('modal-content');
+  content.innerHTML = `
+    <div class="modal-banner">
+      <img src="${p.img}" alt="${p.title}" loading="lazy">
+      <div class="modal-banner-overlay">
+        <div>
+          <div style="font-family:var(--fr);font-size:.7rem;color:var(--cyan);letter-spacing:.2em;text-transform:uppercase;margin-bottom:10px;">// ${p.cat}</div>
+          <div class="modal-title">${p.title}</div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-grid">
+      <div>
+        <div class="modal-section-title">Project Overview</div>
+        <div class="modal-text">${p.desc}</div>
+      </div>
+      <div>
+        <div class="modal-section-title">Software Used</div>
+        <div class="modal-tags">${p.tools.map(t => `<span class="modal-tag">${t}</span>`).join('')}</div>
+      </div>
+    </div>
+    <div class="modal-section-title">Render Gallery</div>
+    <div class="modal-gallery">
+      ${p.gallery.map(g => `<img src="${g}" alt="Gallery" loading="lazy">`).join('')}
+    </div>
+    <div class="modal-section-title">Creative Breakdown</div>
+    <div class="modal-process">
+      ${p.process.map(s => `
+        <div class="process-step">
+          <div class="process-num">${s.n}</div>
+          <div><h4>${s.title}</h4><p>${s.text}</p></div>
+        </div>
+      `).join('')}
+    </div>
+    <div class="modal-section-title">Client Feedback</div>
+    <div class="modal-feedback">
+      <div class="modal-quote">"${p.feedback}"</div>
+      <div class="modal-client">${p.client}</div>
+    </div>
+  `;
+  document.getElementById('project-modal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal() {
+  document.getElementById('project-modal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+document.getElementById('project-modal').addEventListener('click', e => {
+  if (e.target.id === 'project-modal') closeModal();
+});
+
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+/* ─── EMAILJS INIT ─── */
+emailjs.init('dxFoj9HKcbpINcwry'); // 🔑 Replace with your EmailJS Public Key
+
+/* ─── CONTACT FORM ─── */
+function handleForm(e) {
+  e.preventDefault();
+  const btn = document.getElementById('submitBtn');
+  const form = document.getElementById('contactForm');
+
+  btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Sending…';
+  btn.disabled = true; btn.style.opacity = '.7';
+
+  const templateParams = {
+    first_name: form.first_name.value,
+    last_name:  form.last_name.value,
+    email:      form.email.value,
+    service:    form.service.value,
+    budget:     form.budget.value,
+    message:    form.message.value
+  };
+
+  emailjs.send('service_vd09gfn', 'template_ksx22se', templateParams) // 🔑 Replace Service ID & Template ID
+    .then(() => {
+      btn.innerHTML = '✓ Message Sent!';
+      btn.style.background = '#00ff88'; btn.style.borderColor = '#00ff88';
+      btn.style.color = '#020408'; btn.style.opacity = '1';
+      form.reset();
+      setTimeout(() => {
+        btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg> Send Message';
+        btn.style.cssText = ''; btn.disabled = false;
+      }, 5000);
+    })
+    .catch(err => {
+      console.error('EmailJS error:', err);
+      btn.innerHTML = '✗ Failed — Try Again';
+      btn.style.background = '#ff2d78'; btn.style.borderColor = '#ff2d78';
+      btn.style.color = '#fff'; btn.style.opacity = '1';
+      btn.disabled = false;
+      setTimeout(() => {
+        btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg> Send Message';
+        btn.style.cssText = ''; btn.disabled = false;
+      }, 4000);
+    });
+}
+
+/* ─── SMOOTH SCROLL ─── */
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    const t = document.querySelector(a.getAttribute('href'));
+    if (t) { e.preventDefault(); t.scrollIntoView({ behavior: 'smooth' }); }
+  });
+});
+
+/* ─── HIDE CURSOR ON TOUCH ─── */
+window.addEventListener('touchstart', () => {
+  dot.style.display = 'none'; ring.style.display = 'none';
+}, { once: true });
+</script>
+</body>
+</html>
