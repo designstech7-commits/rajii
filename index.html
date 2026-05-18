@@ -1297,6 +1297,7 @@ footer {
     <li><a href="#skills3d">Skills</a></li>
     <li><a href="#tools">Tools</a></li>
     <li><a href="#portfolio">Work</a></li>
+    <li><a href="#logo3d">3D Logo</a></li>
     <li><a href="#services">Services</a></li>
     <li><a href="#testimonials">Reviews</a></li>
     <li><a href="#contact">Contact</a></li>
@@ -1312,6 +1313,7 @@ footer {
   <a href="#skills3d" onclick="toggleMob()">Skills</a>
   <a href="#tools" onclick="toggleMob()">Tools</a>
   <a href="#portfolio" onclick="toggleMob()">Work</a>
+  <a href="#logo3d" onclick="toggleMob()">3D Logo</a>
   <a href="#services" onclick="toggleMob()">Services</a>
   <a href="#testimonials" onclick="toggleMob()">Reviews</a>
   <a href="#contact" onclick="toggleMob()">Contact</a>
@@ -1633,6 +1635,75 @@ footer {
     <!-- Filled dynamically -->
   </div>
 </div>
+
+<div class="sec-div"></div>
+
+<!-- ═══════════════════════════════════════
+     3D LOGO SHOWCASE SECTION
+═══════════════════════════════════════ -->
+<section id="logo3d" style="background:var(--bg3);min-height:100vh;display:flex;flex-direction:column;justify-content:center;">
+  <div class="sec-center reveal" style="max-width:650px;margin:0 auto 60px;">
+    <span class="sec-tag">Signature Identity</span>
+    <h2 class="sec-title">My <span class="hl">3D Logo</span></h2>
+    <p class="sec-desc">An interactive real-time 3D rendering of my personal brand mark — drag to rotate, scroll to zoom. Built with Three.js and pure passion for 3D craft.</p>
+  </div>
+
+  <!-- 3D LOGO CANVAS AREA -->
+  <div id="logo3d-stage" style="position:relative;width:100%;max-width:900px;margin:0 auto;height:520px;">
+    <canvas id="logo3d-canvas" style="width:100%;height:100%;border-radius:20px;border:1px solid var(--border);background:transparent;display:block;"></canvas>
+
+    <!-- HUD overlays -->
+    <div style="position:absolute;top:22px;left:28px;pointer-events:none;">
+      <div style="font-family:var(--fr);font-size:.62rem;color:var(--cyan);letter-spacing:.25em;text-transform:uppercase;opacity:.7;">// Interactive 3D</div>
+      <div style="font-family:var(--fd);font-size:.88rem;font-weight:900;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:.1em;">RAJESH.S</div>
+    </div>
+    <div style="position:absolute;top:22px;right:28px;pointer-events:none;text-align:right;">
+      <div style="font-family:var(--fr);font-size:.6rem;color:var(--muted);letter-spacing:.15em;text-transform:uppercase;">Three.js · WebGL</div>
+      <div style="display:flex;gap:6px;justify-content:flex-end;margin-top:5px;">
+        <span style="width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green);display:block;animation:blink1 2s infinite;"></span>
+        <span style="font-family:var(--fr);font-size:.58rem;color:var(--muted);letter-spacing:.1em;">LIVE RENDER</span>
+      </div>
+    </div>
+
+    <!-- Bottom controls hint -->
+    <div style="position:absolute;bottom:22px;left:50%;transform:translateX(-50%);display:flex;gap:24px;pointer-events:none;">
+      <div style="display:flex;align-items:center;gap:7px;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(0,245,255,.5)" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/></svg>
+        <span style="font-family:var(--fr);font-size:.6rem;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;">Drag to Rotate</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:7px;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(0,245,255,.5)" stroke-width="1.5"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+        <span style="font-family:var(--fr);font-size:.6rem;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;">Scroll to Zoom</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Color / Style Switcher -->
+  <div class="reveal" style="display:flex;gap:14px;justify-content:center;margin-top:36px;flex-wrap:wrap;">
+    <div style="font-family:var(--fr);font-size:.66rem;color:var(--muted);letter-spacing:.15em;text-transform:uppercase;align-self:center;">Theme:</div>
+    <button class="logo3d-theme-btn active" data-theme="cyan"   onclick="setLogo3dTheme('cyan')"   style="padding:8px 20px;border-radius:3px;border:1px solid rgba(0,245,255,.5);background:rgba(0,245,255,.08);color:var(--cyan);font-family:var(--fr);font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;cursor:none;transition:all .25s;">Cyan</button>
+    <button class="logo3d-theme-btn"        data-theme="purple" onclick="setLogo3dTheme('purple')" style="padding:8px 20px;border-radius:3px;border:1px solid rgba(139,0,255,.4);background:rgba(139,0,255,.06);color:#b560ff;font-family:var(--fr);font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;cursor:none;transition:all .25s;">Purple</button>
+    <button class="logo3d-theme-btn"        data-theme="gold"   onclick="setLogo3dTheme('gold')"   style="padding:8px 20px;border-radius:3px;border:1px solid rgba(255,215,0,.4);background:rgba(255,215,0,.06);color:#ffd700;font-family:var(--fr);font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;cursor:none;transition:all .25s;">Gold</button>
+    <button class="logo3d-theme-btn"        data-theme="pink"   onclick="setLogo3dTheme('pink')"   style="padding:8px 20px;border-radius:3px;border:1px solid rgba(255,45,120,.4);background:rgba(255,45,120,.06);color:#ff2d78;font-family:var(--fr);font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;cursor:none;transition:all .25s;">Pink</button>
+    <button class="logo3d-theme-btn"        data-theme="auto"   onclick="setLogo3dTheme('auto')"   style="padding:8px 20px;border-radius:3px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.04);color:var(--muted);font-family:var(--fr);font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;cursor:none;transition:all .25s;">Auto Cycle</button>
+  </div>
+
+  <!-- Stats row -->
+  <div class="reveal" style="display:flex;gap:52px;justify-content:center;margin-top:56px;flex-wrap:wrap;">
+    <div style="text-align:center;">
+      <div style="font-family:var(--fd);font-size:1.6rem;font-weight:900;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">60fps</div>
+      <div style="font-family:var(--fr);font-size:.62rem;color:var(--muted);letter-spacing:.15em;text-transform:uppercase;margin-top:4px;">Render Rate</div>
+    </div>
+    <div style="text-align:center;">
+      <div style="font-family:var(--fd);font-size:1.6rem;font-weight:900;background:var(--grad2);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">WebGL</div>
+      <div style="font-family:var(--fr);font-size:.62rem;color:var(--muted);letter-spacing:.15em;text-transform:uppercase;margin-top:4px;">Engine</div>
+    </div>
+    <div style="text-align:center;">
+      <div style="font-family:var(--fd);font-size:1.6rem;font-weight:900;background:var(--grad3);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">Real-time</div>
+      <div style="font-family:var(--fr);font-size:.62rem;color:var(--muted);letter-spacing:.15em;text-transform:uppercase;margin-top:4px;">3D Rendering</div>
+    </div>
+  </div>
+</section>
 
 <div class="sec-div"></div>
 
@@ -2378,6 +2449,334 @@ document.querySelectorAll('a[href^="#"]').forEach(a => {
 window.addEventListener('touchstart', () => {
   dot.style.display = 'none'; ring.style.display = 'none';
 }, { once: true });
+</script>
+
+<!-- ═══ 3D LOGO — Three.js Scene ═══ -->
+<script>
+(function(){
+  const canvas = document.getElementById('logo3d-canvas');
+  if(!canvas) return;
+
+  /* ── Renderer ── */
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1.2;
+
+  function resize() {
+    const w = canvas.clientWidth, h = canvas.clientHeight;
+    renderer.setSize(w, h, false);
+    camera.aspect = w / h;
+    camera.updateProjectionMatrix();
+  }
+
+  /* ── Camera ── */
+  const camera = new THREE.PerspectiveCamera(42, 1, 0.1, 100);
+  camera.position.set(0, 0, 7);
+
+  /* ── Scene ── */
+  const scene = new THREE.Scene();
+
+  /* ── Lights ── */
+  scene.add(new THREE.AmbientLight(0x111122, 1.5));
+
+  const keyLight = new THREE.DirectionalLight(0x00f5ff, 4);
+  keyLight.position.set(5, 8, 6);
+  keyLight.castShadow = true;
+  scene.add(keyLight);
+
+  const fillLight = new THREE.DirectionalLight(0x8b00ff, 2.5);
+  fillLight.position.set(-6, -2, 4);
+  scene.add(fillLight);
+
+  const rimLight = new THREE.DirectionalLight(0xff2d78, 2);
+  rimLight.position.set(0, -5, -5);
+  scene.add(rimLight);
+
+  const pLight1 = new THREE.PointLight(0x00f5ff, 3, 12);
+  pLight1.position.set(3, 3, 3);
+  scene.add(pLight1);
+
+  const pLight2 = new THREE.PointLight(0x8b00ff, 2, 10);
+  pLight2.position.set(-3, -2, 2);
+  scene.add(pLight2);
+
+  /* ── Materials ── */
+  const themes = {
+    cyan:   { color: 0x00f5ff, emissive: 0x003344, metal: 0.85, rough: 0.12, lColor: 0x00f5ff },
+    purple: { color: 0xb560ff, emissive: 0x220033, metal: 0.9,  rough: 0.1,  lColor: 0x8b00ff },
+    gold:   { color: 0xffd700, emissive: 0x443300, metal: 0.95, rough: 0.08, lColor: 0xffd700 },
+    pink:   { color: 0xff2d78, emissive: 0x330011, metal: 0.85, rough: 0.14, lColor: 0xff2d78 },
+    auto:   null
+  };
+  let currentTheme = 'cyan';
+  let autoT = 0;
+  const themeKeys = ['cyan','purple','gold','pink'];
+
+  function makeMat(t) {
+    return new THREE.MeshStandardMaterial({
+      color: t.color, emissive: t.emissive,
+      metalness: t.metal, roughness: t.rough,
+      envMapIntensity: 1.2
+    });
+  }
+  let mat = makeMat(themes.cyan);
+
+  /* ── Build "RS" logo geometry ── */
+  const group = new THREE.Group();
+  scene.add(group);
+
+  function makeExtruded(shape, depth) {
+    return new THREE.ExtrudeGeometry(shape, {
+      depth, bevelEnabled: true, bevelThickness: 0.06,
+      bevelSize: 0.06, bevelSegments: 6
+    });
+  }
+
+  /* — Letter R — */
+  function buildR() {
+    const g = new THREE.Group();
+    const thick = 0.28;
+
+    // Vertical stem
+    const stemSh = new THREE.Shape();
+    stemSh.moveTo(0,0); stemSh.lineTo(thick,0);
+    stemSh.lineTo(thick,2.6); stemSh.lineTo(0,2.6); stemSh.lineTo(0,0);
+    const stem = new THREE.Mesh(makeExtruded(stemSh,0.42), mat);
+    g.add(stem);
+
+    // Top arch (semicircle bump) — approximated with bezier rect
+    const archSh = new THREE.Shape();
+    archSh.moveTo(thick,1.6); archSh.lineTo(thick,2.6);
+    archSh.lineTo(thick+0.7,2.6);
+    archSh.bezierCurveTo(thick+1.0,2.6, thick+1.0,1.6, thick+0.7,1.6);
+    archSh.lineTo(thick,1.6);
+    const arch = new THREE.Mesh(makeExtruded(archSh,0.42), mat);
+    g.add(arch);
+
+    // Top crossbar
+    const cbSh = new THREE.Shape();
+    cbSh.moveTo(thick,1.6); cbSh.lineTo(thick+0.7,1.6);
+    cbSh.lineTo(thick+0.7,1.88); cbSh.lineTo(thick,1.88); cbSh.lineTo(thick,1.6);
+    const cb = new THREE.Mesh(makeExtruded(cbSh,0.42), mat);
+    g.add(cb);
+
+    // Leg diagonal
+    const legSh = new THREE.Shape();
+    legSh.moveTo(thick+0.1,1.6); legSh.lineTo(thick+0.9,0);
+    legSh.lineTo(thick+1.14,0); legSh.lineTo(thick+0.34,1.6);
+    legSh.lineTo(thick+0.1,1.6);
+    const leg = new THREE.Mesh(makeExtruded(legSh,0.42), mat);
+    g.add(leg);
+
+    g.position.set(-1.6,-1.3,0);
+    return g;
+  }
+
+  /* — Letter S — */
+  function buildS() {
+    const g = new THREE.Group();
+    const w=1.1, h=2.6, t=0.28;
+
+    // Top bar
+    const topSh = new THREE.Shape();
+    topSh.moveTo(0,h-t); topSh.lineTo(w,h-t); topSh.lineTo(w,h); topSh.lineTo(0,h); topSh.lineTo(0,h-t);
+    g.add(new THREE.Mesh(makeExtruded(topSh,0.42), mat));
+
+    // Mid bar
+    const midSh = new THREE.Shape();
+    const mY = h/2 - t/2;
+    midSh.moveTo(0,mY); midSh.lineTo(w,mY); midSh.lineTo(w,mY+t); midSh.lineTo(0,mY+t); midSh.lineTo(0,mY);
+    g.add(new THREE.Mesh(makeExtruded(midSh,0.42), mat));
+
+    // Bot bar
+    const botSh = new THREE.Shape();
+    botSh.moveTo(0,0); botSh.lineTo(w,0); botSh.lineTo(w,t); botSh.lineTo(0,t); botSh.lineTo(0,0);
+    g.add(new THREE.Mesh(makeExtruded(botSh,0.42), mat));
+
+    // Left upper vertical (top to mid)
+    const luSh = new THREE.Shape();
+    luSh.moveTo(0, mY+t); luSh.lineTo(t, mY+t); luSh.lineTo(t, h-t); luSh.lineTo(0, h-t); luSh.lineTo(0, mY+t);
+    g.add(new THREE.Mesh(makeExtruded(luSh,0.42), mat));
+
+    // Right lower vertical (mid to bottom)
+    const rlSh = new THREE.Shape();
+    rlSh.moveTo(w-t, t); rlSh.lineTo(w, t); rlSh.lineTo(w, mY); rlSh.lineTo(w-t, mY); rlSh.lineTo(w-t, t);
+    g.add(new THREE.Mesh(makeExtruded(rlSh,0.42), mat));
+
+    g.position.set(0.18,-1.3,0);
+    return g;
+  }
+
+  const rGroup = buildR();
+  const sGroup = buildS();
+  group.add(rGroup, sGroup);
+
+  /* ── Particle ring ── */
+  const partCount = 160;
+  const partPos = new Float32Array(partCount * 3);
+  const partPhase = new Float32Array(partCount);
+  for(let i=0;i<partCount;i++){
+    const angle = (i/partCount)*Math.PI*2;
+    const r = 3.2 + (Math.random()-0.5)*0.6;
+    partPos[i*3]   = Math.cos(angle)*r;
+    partPos[i*3+1] = Math.sin(angle)*r;
+    partPos[i*3+2] = (Math.random()-0.5)*0.8;
+    partPhase[i]   = Math.random()*Math.PI*2;
+  }
+  const partGeo = new THREE.BufferGeometry();
+  partGeo.setAttribute('position', new THREE.BufferAttribute(partPos,3));
+  const partMat = new THREE.PointsMaterial({ color:0x00f5ff, size:0.055, transparent:true, opacity:0.7, sizeAttenuation:true });
+  const particles = new THREE.Points(partGeo, partMat);
+  scene.add(particles);
+
+  /* ── Glow ring ── */
+  const ringGeo = new THREE.TorusGeometry(3.2, 0.018, 6, 120);
+  const ringMat = new THREE.MeshBasicMaterial({ color:0x00f5ff, transparent:true, opacity:0.25 });
+  const ring3d = new THREE.Mesh(ringGeo, ringMat);
+  scene.add(ring3d);
+
+  /* ── Orbit decorators ── */
+  function makeOrb(r, color) {
+    const g = new THREE.Mesh(new THREE.SphereGeometry(0.07,10,10), new THREE.MeshBasicMaterial({color}));
+    scene.add(g);
+    return g;
+  }
+  const orb1 = makeOrb(0.07, 0x00f5ff);
+  const orb2 = makeOrb(0.05, 0x8b00ff);
+  const orb3 = makeOrb(0.06, 0xff2d78);
+
+  /* ── Mouse / drag controls ── */
+  let isDragging = false, lastX=0, lastY=0;
+  let rotX=0.3, rotY=0.5, velX=0, velY=0;
+  let autoSpin = true;
+
+  canvas.addEventListener('mousedown', e => { isDragging=true; lastX=e.clientX; lastY=e.clientY; autoSpin=false; });
+  window.addEventListener('mousemove', e => {
+    if(!isDragging) return;
+    velY += (e.clientX - lastX)*0.012;
+    velX += (e.clientY - lastY)*0.012;
+    lastX=e.clientX; lastY=e.clientY;
+  });
+  window.addEventListener('mouseup', () => { isDragging=false; });
+
+  canvas.addEventListener('touchstart', e => { isDragging=true; lastX=e.touches[0].clientX; lastY=e.touches[0].clientY; autoSpin=false; });
+  canvas.addEventListener('touchmove', e => {
+    if(!isDragging) return;
+    velY += (e.touches[0].clientX - lastX)*0.012;
+    velX += (e.touches[0].clientY - lastY)*0.012;
+    lastX=e.touches[0].clientX; lastY=e.touches[0].clientY;
+    e.preventDefault();
+  }, { passive:false });
+  canvas.addEventListener('touchend', () => { isDragging=false; });
+
+  let zoomDist = 7;
+  canvas.addEventListener('wheel', e => {
+    zoomDist = Math.max(3.5, Math.min(12, zoomDist + e.deltaY*0.01));
+  }, { passive:true });
+
+  /* ── Theme switcher ── */
+  window.setLogo3dTheme = function(name) {
+    currentTheme = name;
+    document.querySelectorAll('.logo3d-theme-btn').forEach(b => {
+      b.style.opacity = b.dataset.theme === name ? '1' : '0.55';
+    });
+    if(name !== 'auto') applyTheme(themes[name]);
+  };
+
+  function applyTheme(t) {
+    mat.color.setHex(t.color);
+    mat.emissive.setHex(t.emissive);
+    mat.metalness = t.metal;
+    mat.roughness = t.rough;
+    mat.needsUpdate = true;
+    pLight1.color.setHex(t.lColor);
+    keyLight.color.setHex(t.lColor);
+    partMat.color.setHex(t.lColor);
+    ringMat.color.setHex(t.lColor);
+  }
+
+  /* ── Animation loop ── */
+  const clock = new THREE.Clock();
+  let animFrame;
+
+  function animate() {
+    animFrame = requestAnimationFrame(animate);
+    const t = clock.getElapsedTime();
+
+    // Auto-spin
+    if(autoSpin) {
+      velY += 0.006;
+    }
+
+    // Auto-cycle theme
+    if(currentTheme === 'auto') {
+      autoT += 0.004;
+      const idx = Math.floor(autoT) % themeKeys.length;
+      const frac = autoT % 1;
+      const tA = themes[themeKeys[idx]];
+      const tB = themes[themeKeys[(idx+1) % themeKeys.length]];
+      const lerpColor = (a,b,f) => Math.round(a*(1-f)+b*f);
+      const c = (hex) => [(hex>>16)&255,(hex>>8)&255,hex&255];
+      const cA=c(tA.color), cB=c(tB.color);
+      mat.color.setRGB(lerpColor(cA[0],cB[0],frac)/255, lerpColor(cA[1],cB[1],frac)/255, lerpColor(cA[2],cB[2],frac)/255);
+    }
+
+    // Damping
+    rotX += velX; rotY += velY;
+    velX *= 0.88; velY *= 0.88;
+    if(autoSpin) velY += 0.005;
+
+    group.rotation.x = rotX;
+    group.rotation.y = rotY;
+
+    // Camera zoom lerp
+    camera.position.z += (zoomDist - camera.position.z) * 0.08;
+    camera.updateProjectionMatrix();
+
+    // Particles breathe
+    const pos = partGeo.attributes.position;
+    for(let i=0;i<partCount;i++){
+      const angle = (i/partCount)*Math.PI*2;
+      const pulse = 3.2 + Math.sin(t*1.2 + partPhase[i])*0.18;
+      pos.array[i*3]   = Math.cos(angle + t*0.15)*pulse;
+      pos.array[i*3+1] = Math.sin(angle + t*0.15)*pulse;
+    }
+    pos.needsUpdate = true;
+
+    // Ring pulse
+    ring3d.rotation.z = t*0.2;
+    const rScale = 1 + Math.sin(t*1.8)*0.03;
+    ring3d.scale.set(rScale, rScale, 1);
+    ringMat.opacity = 0.15 + Math.sin(t*2)*0.08;
+
+    // Orbiting decorators
+    orb1.position.set(Math.cos(t*0.8)*3.4, Math.sin(t*0.8)*3.4, Math.sin(t*0.5)*0.6);
+    orb2.position.set(Math.cos(t*1.1 + 2.09)*2.8, Math.sin(t*1.1 + 2.09)*2.8, Math.cos(t*0.7)*0.5);
+    orb3.position.set(Math.cos(t*0.6 + 4.18)*3.1, Math.sin(t*0.6 + 4.18)*3.1, Math.sin(t*0.9)*0.4);
+
+    // Point light float
+    pLight1.position.set(3+Math.sin(t*0.7)*1.5, 3+Math.cos(t*0.5)*1.5, 3);
+    pLight2.position.set(-3+Math.cos(t*0.9)*1.5, -2+Math.sin(t*0.6)*1, 2);
+
+    renderer.render(scene, camera);
+  }
+
+  resize();
+  window.addEventListener('resize', resize);
+  animate();
+
+  // Pause when section out of view
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if(e.isIntersecting) { clock.start(); animate(); }
+      else { cancelAnimationFrame(animFrame); }
+    });
+  }, { threshold: 0.1 });
+  observer.observe(document.getElementById('logo3d'));
+})();
 </script>
 </body>
 </html>
