@@ -2273,11 +2273,11 @@ footer {
       <div class="fb-fg">
         <label>Overall Rating *</label>
         <div class="star-row" id="star-row">
-          <button class="star-btn" data-v="1" onclick="setStars(1)">★</button>
-          <button class="star-btn" data-v="2" onclick="setStars(2)">★</button>
-          <button class="star-btn" data-v="3" onclick="setStars(3)">★</button>
-          <button class="star-btn" data-v="4" onclick="setStars(4)">★</button>
-          <button class="star-btn" data-v="5" onclick="setStars(5)">★</button>
+          <button class="star-btn" data-v="1" onclick="window.fbData.stars=1;setStars(1)">★</button>
+          <button class="star-btn" data-v="2" onclick="window.fbData.stars=2;setStars(2)">★</button>
+          <button class="star-btn" data-v="3" onclick="window.fbData.stars=3;setStars(3)">★</button>
+          <button class="star-btn" data-v="4" onclick="window.fbData.stars=4;setStars(4)">★</button>
+          <button class="star-btn" data-v="5" onclick="window.fbData.stars=5;setStars(5)">★</button>
         </div>
         <div class="star-label" id="star-label">Click a star to rate</div>
       </div>
@@ -2978,7 +2978,8 @@ buildSubStars('sub-time');
 buildSubStars('sub-value');
 
 // Global state
-let fbData = { stars: 0, mood: '', recommend: '' };
+window.fbData = { stars: 0, mood: '', recommend: '' };
+let fbData = window.fbData;
 
 function setStars(n) {
   n = parseInt(n);
@@ -3021,8 +3022,7 @@ function fbNext(current) {
     if(!document.getElementById('fb-email').value.trim()) { alert('Please enter your email.'); return; }
   }
   if(current === 2) {
-    if(fbData.stars === 0 && !window._fbStars) { alert('Please select a star rating.'); return; }
-    if(window._fbStars && fbData.stars === 0) fbData.stars = window._fbStars;
+    if(window.fbData.stars === 0) { alert('Please select a star rating.'); return; }
   }
   if(current === 3) {
     if(!document.getElementById('fb-loved').value.trim()) { alert('Please share what you loved most.'); return; }
@@ -3089,7 +3089,7 @@ function buildSummary() {
    }
    ────────────────────────────────────────────────────
 */
-const SHEETS_URL = 'YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE';
+const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbyppL78CzeeqpSeTKC5IVoYiGtaxNKxft_oNYvrB015MUXrdPtE0e6XqXNwpNwsiTRm/exec';
 
 function submitFeedback() {
   const btn = document.getElementById('fb-submit-btn');
@@ -3138,11 +3138,12 @@ function submitFeedback() {
       console.info('ℹ️ Google Sheets URL not configured. Set SHEETS_URL to enable permanent storage.');
       return Promise.resolve();
     }
+    const formData = new FormData();
+    formData.append('data', JSON.stringify(ratingEntry));
     return fetch(SHEETS_URL, {
       method: 'POST',
       mode: 'no-cors',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(ratingEntry)
+      body: formData
     }).then(() => {
       console.log('✅ Feedback saved to Google Sheets');
     }).catch(err => {
