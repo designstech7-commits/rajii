@@ -3089,7 +3089,7 @@ function buildSummary() {
    }
    ────────────────────────────────────────────────────
 */
-const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbyppL78CzeeqpSeTKC5IVoYiGtaxNKxft_oNYvrB015MUXrdPtE0e6XqXNwpNwsiTRm/exec';
+const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbxYgUUmk9q61wiI9273rpMhLWVB562iEMLEqWGMvCVksLWuBoqyiV_gSt7aDiUbaQPH/exec';
 
 function submitFeedback() {
   const btn = document.getElementById('fb-submit-btn');
@@ -3138,12 +3138,9 @@ function submitFeedback() {
       console.info('ℹ️ Google Sheets URL not configured. Set SHEETS_URL to enable permanent storage.');
       return Promise.resolve();
     }
-    const formData = new FormData();
-    formData.append('data', JSON.stringify(ratingEntry));
-    return fetch(SHEETS_URL, {
-      method: 'POST',
-      mode: 'no-cors',
-      body: formData
+    return fetch(SHEETS_URL + '?data=' + encodeURIComponent(JSON.stringify(ratingEntry)), {
+      method: 'GET',
+      mode: 'no-cors'
     }).then(() => {
       console.log('✅ Feedback saved to Google Sheets');
     }).catch(err => {
@@ -3188,12 +3185,51 @@ function submitFeedback() {
 }
 
 /* ─── RATINGS WIDGET — reads from localStorage and renders ─── */
-function renderRatingsWidget() {
+function renderRatingsWidget(ratingsOverride) {
   const container = document.getElementById('rs-ratings-widget');
   if (!container) return;
 
-  let ratings = [];
-  try { ratings = JSON.parse(localStorage.getItem('rs_ratings') || '[]'); } catch(e) {}
+  // If ratings passed directly, render immediately
+  if (ratingsOverride) {
+    _doRender(container, ratingsOverride);
+    return;
+  }
+
+  // Show loading
+  container.innerHTML = '<p style="color:var(--muted);font-family:var(--fr);font-size:.82rem;text-align:center;padding:28px 0;">Loading reviews...</p>';
+
+  // Load from Google Sheets
+  fetch(SHEETS_URL)
+    .then(r => r.json())
+    .then(data => {
+      const ratings = data.map(row => ({
+        name:       row['Name'] || '—',
+        company:    row['Company'] || '—',
+        service:    row['Service'] || '—',
+        stars:      parseFloat(row['Stars']) || 0,
+        mood:       row['Mood'] || '',
+        quality:    parseFloat(row['Quality']) || 0,
+        comm:       parseFloat(row['Communication']) || 0,
+        timeliness: parseFloat(row['Timeliness']) || 0,
+        value:      parseFloat(row['Value']) || 0,
+        loved:      row['Loved'] || '',
+        recommend:  (row['Recommend']||'').toLowerCase(),
+        consent:    row['Testimonial OK'] === 'Yes',
+        date:       row['Timestamp'] || ''
+      }));
+      // Save to localStorage as backup
+      try { localStorage.setItem('rs_ratings', JSON.stringify(ratings)); } catch(e) {}
+      _doRender(container, ratings);
+    })
+    .catch(() => {
+      // Fallback to localStorage
+      let ratings = [];
+      try { ratings = JSON.parse(localStorage.getItem('rs_ratings') || '[]'); } catch(e) {}
+      _doRender(container, ratings);
+    });
+}
+
+function _doRender(container, ratings) {
 
   if (ratings.length === 0) {
     container.innerHTML = '<p style="color:var(--muted);font-family:var(--fr);font-size:.82rem;text-align:center;padding:28px 0;">No client ratings yet. Be the first to leave feedback!</p>';
